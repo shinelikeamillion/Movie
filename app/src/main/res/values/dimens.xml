@@ -4,7 +4,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <!-- dimen for gridView columnWith -->
-    <dimen name="poster_with">120dp</dimen>
+    <dimen name="poster_height">240dp</dimen>
     <dimen name="poster_spacing">2dp</dimen>
 
 </resources>

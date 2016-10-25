@@ -8,7 +8,7 @@
         android:id="@+id/grid_for_movies"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:columnWidth="@dimen/poster_with"
+        android:numColumns="2"
         android:verticalSpacing="@dimen/poster_spacing"
         android:horizontalSpacing="@dimen/poster_spacing"
         android:stretchMode="columnWidth"/>

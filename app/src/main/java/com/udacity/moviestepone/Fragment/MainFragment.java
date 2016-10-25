@@ -3,15 +3,20 @@ package com.udacity.moviestepone.Fragment;
 
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
+import com.udacity.moviestepone.Adapter.MoviesGridAdapter;
 import com.udacity.moviestepone.BuildConfig;
 import com.udacity.moviestepone.R;
 import com.udacity.moviestepone.model.MovieInfo;
@@ -38,6 +43,11 @@ public class MainFragment extends Fragment {
 
     private GridView gridView;
 
+    private MoviesGridAdapter moviesAdapter;
+
+    private final String TOP_RATED = "top_rated";
+    private final String POPULAR = "popular";
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +59,29 @@ public class MainFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         gridView = (GridView) view.findViewById(R.id.grid_for_movies);
-        new FetchMoviesTask().execute("top_rated");
+
+        moviesAdapter = new MoviesGridAdapter(getActivity(), new ArrayList<MovieInfo>());
+        gridView.setAdapter(moviesAdapter);
+
+        new FetchMoviesTask().execute(POPULAR);
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
+        inflater.inflate(R.menu.menu_main_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_most_popular) {
+            new FetchMoviesTask().execute(POPULAR);
+        } else if (id == R.id.action_top_rated) {
+            new FetchMoviesTask().execute(TOP_RATED);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -68,6 +99,21 @@ public class MainFragment extends Fragment {
                 return null;
             }
             return getMovies(params[0]);
+        }
+
+        @Override
+        protected void onPostExecute(MovieResults movieResults) {
+            if (movieResults != null) {
+                moviesAdapter.clear();
+                if (Build.VERSION.SDK_INT > 11) {
+                    moviesAdapter.addAll(movieResults.results);
+                } else {
+                    for (MovieInfo movieInfo : movieResults.results) {
+                        moviesAdapter.add(movieInfo);
+                    }
+                    moviesAdapter.notifyDataSetChanged();
+                }
+            }
         }
 
         private MovieResults getMovies (String choice) {
