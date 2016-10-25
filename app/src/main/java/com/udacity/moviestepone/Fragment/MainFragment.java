@@ -1,6 +1,7 @@
 package com.udacity.moviestepone.Fragment;
 
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -14,8 +15,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
+import com.udacity.moviestepone.Activity.DetailActivity;
 import com.udacity.moviestepone.Adapter.MoviesGridAdapter;
 import com.udacity.moviestepone.BuildConfig;
 import com.udacity.moviestepone.R;
@@ -55,13 +58,22 @@ public class MainFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         gridView = (GridView) view.findViewById(R.id.grid_for_movies);
 
         moviesAdapter = new MoviesGridAdapter(getActivity(), new ArrayList<MovieInfo>());
         gridView.setAdapter(moviesAdapter);
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                intent.putExtra(Intent.EXTRA_RETURN_RESULT, moviesAdapter.getItem(position));
+                startActivity(intent);
+            }
+        });
 
         new FetchMoviesTask().execute(POPULAR);
         return view;
@@ -245,7 +257,7 @@ public class MainFragment extends Fragment {
                         movieJson.getString(M_ORIGINAL_LANGUAGE),
                         movieJson.getString(M_TITLE),
                         movieJson.getString(M_BACKDROP_PATH),
-                        movieJson.getString(M_POPULARITY),
+                        Float.parseFloat(movieJson.getString(M_POPULARITY)),
                         movieJson.getInt(M_VOTE_COUNT),
                         movieJson.getBoolean(M_VIDEO),
                         movieJson.getInt(M_VOTE_AVERAGE));

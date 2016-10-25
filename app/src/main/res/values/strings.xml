@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">MovieStepOne</string>
+    <string name="title_activity_detail">DetailActivity</string>
+
+    <!-- menu -->
+    <string name="action_top_rated">top_rated</string>
+    <string name="action_popular">popular</string>
+
+    <!-- DetailFragment -->
+    <string name="release_date">Release date : %s</string>
+    <string name="popularity">Popularity : %2.2f</string>
+    <string name="vote_count">Vote count : %d </string>
+    <string name="overview">OverView : \n \t %s</string>
 
 </resources>

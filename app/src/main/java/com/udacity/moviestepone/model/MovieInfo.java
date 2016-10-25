@@ -20,7 +20,7 @@ public class MovieInfo implements Parcelable{
     public String original_language;                                    // 语言
     public String title;                                                // 片名
     public String backdrop_path;
-    public String popularity;                                           // 受欢迎度
+    public float popularity;                                           // 受欢迎度
     public int vote_count;                                              // 评分数量
     public boolean video;
     public int vote_average;                                            // 平均得分
@@ -35,7 +35,7 @@ public class MovieInfo implements Parcelable{
                       String original_language,
                       String title,
                       String backdrop_path,
-                      String popularity,
+                      float popularity,
                       int vote_count,
                       boolean video,
                       int vote_average) {
@@ -67,7 +67,7 @@ public class MovieInfo implements Parcelable{
         original_language = in.readString();
         title = in.readString();
         backdrop_path = in.readString();
-        popularity = in.readString();
+        popularity = in.readFloat();
         vote_count = in.readInt();
         video = in.readByte() != 0;
         vote_average = in.readInt();
@@ -122,7 +122,7 @@ public class MovieInfo implements Parcelable{
         dest.writeString(original_language);
         dest.writeString(title);
         dest.writeString(backdrop_path);
-        dest.writeString(popularity);
+        dest.writeFloat(popularity);
         dest.writeInt(vote_count);
         dest.writeByte((byte) (video ? 1 : 0));
         dest.writeInt(vote_average);

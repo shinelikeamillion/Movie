@@ -3,8 +3,16 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="normal_spacing">10dp</dimen>
+
     <!-- dimen for gridView columnWith -->
     <dimen name="poster_height">240dp</dimen>
     <dimen name="poster_spacing">2dp</dimen>
+
+    <!-- dimens for detail fragment -->
+    <dimen name="detail_title_height">60dp</dimen>
+    <dimen name="title_size">30sp</dimen>
+    <dimen name="detail_poster_width">140dp</dimen>
+    <dimen name="detail_poster_height">200dp</dimen>
 
 </resources>
