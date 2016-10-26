@@ -1,4 +1,4 @@
-package com.udacity.moviestepone.Fragment;
+package com.udacity.moviestepone.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;

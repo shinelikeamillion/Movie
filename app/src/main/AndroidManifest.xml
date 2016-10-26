@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.udacity.moviestepone">
 
+    <!-- 联网权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 网络状态 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -10,7 +13,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activity.MainActivity">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -18,9 +21,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activity.DetailActivity"
+            android:name=".activity.DetailActivity"
             android:label="@string/title_activity_detail"
-            android:parentActivityName=".Activity.MainActivity"/>
+            android:parentActivityName=".activity.MainActivity"/>
     </application>
 
 </manifest>

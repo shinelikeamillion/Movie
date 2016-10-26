@@ -1,9 +1,9 @@
-package com.udacity.moviestepone.Activity;
+package com.udacity.moviestepone.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.udacity.moviestepone.Fragment.DetailFragment;
+import com.udacity.moviestepone.fragment.DetailFragment;
 import com.udacity.moviestepone.R;
 
 public class DetailActivity extends AppCompatActivity {

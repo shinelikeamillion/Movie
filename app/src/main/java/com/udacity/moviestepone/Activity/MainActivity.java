@@ -1,9 +1,9 @@
-package com.udacity.moviestepone.Activity;
+package com.udacity.moviestepone.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.udacity.moviestepone.Fragment.MainFragment;
+import com.udacity.moviestepone.fragment.MainFragment;
 import com.udacity.moviestepone.R;
 
 public class MainActivity extends AppCompatActivity {

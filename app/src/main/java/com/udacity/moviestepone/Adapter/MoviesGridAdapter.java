@@ -1,4 +1,4 @@
-package com.udacity.moviestepone.Adapter;
+package com.udacity.moviestepone.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
