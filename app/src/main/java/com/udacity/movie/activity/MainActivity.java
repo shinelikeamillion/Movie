@@ -1,24 +1,25 @@
-package com.udacity.moviestepone.activity;
+package com.udacity.movie.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.udacity.moviestepone.fragment.DetailFragment;
-import com.udacity.moviestepone.R;
+import com.udacity.movie.fragment.MainFragment;
+import com.udacity.movie.R;
 
-public class DetailActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
+
+    private final String TAG= this.getClass().getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
+        setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.container, new DetailFragment())
+                    .add(R.id.container, new MainFragment())
                     .commit();
         }
     }
-
 }

@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.udacity.moviestepone.fragment.MainFragment">
+    tools:context="com.udacity.movie.fragment.MainFragment">
 
     <GridView
         android:id="@+id/grid_for_movies"

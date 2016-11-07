@@ -1,5 +1,5 @@
-MovieStepOne
-============
+Movie
+=====
 for Udacity
 
 ### The Movie Database API Key is required.

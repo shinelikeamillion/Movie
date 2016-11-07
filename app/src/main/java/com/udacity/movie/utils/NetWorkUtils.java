@@ -1,4 +1,4 @@
-package com.udacity.moviestepone.utils;
+package com.udacity.movie.utils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

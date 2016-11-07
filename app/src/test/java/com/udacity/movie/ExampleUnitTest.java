@@ -1,4 +1,4 @@
-package com.udacity.moviestepone;
+package com.udacity.movie;
 
 import org.junit.Test;
 

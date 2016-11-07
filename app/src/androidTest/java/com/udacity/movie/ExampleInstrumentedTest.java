@@ -1,4 +1,4 @@
-package com.udacity.moviestepone;
+package com.udacity.movie;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.udacity.moviestepone", appContext.getPackageName());
+        assertEquals("com.udacity.movie", appContext.getPackageName());
     }
 }

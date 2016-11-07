@@ -1,4 +1,4 @@
-package com.udacity.moviestepone.model;
+package com.udacity.movie.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -1,4 +1,4 @@
-package com.udacity.moviestepone.Fragment;
+package com.udacity.movie.fragment;
 
 
 import android.content.Intent;
@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,12 +19,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import com.udacity.moviestepone.Activity.DetailActivity;
-import com.udacity.moviestepone.Adapter.MoviesGridAdapter;
-import com.udacity.moviestepone.BuildConfig;
-import com.udacity.moviestepone.R;
-import com.udacity.moviestepone.model.MovieInfo;
-import com.udacity.moviestepone.model.MovieResults;
+import com.udacity.movie.BuildConfig;
+import com.udacity.movie.R;
+import com.udacity.movie.activity.DetailActivity;
+import com.udacity.movie.adapter.MoviesGridAdapter;
+import com.udacity.movie.model.MovieInfo;
+import com.udacity.movie.model.MovieResults;
+import com.udacity.movie.utils.NetWorkUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +40,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import static android.support.design.widget.Snackbar.make;
+
 /**
  */
 public class MainFragment extends Fragment {
@@ -45,6 +49,7 @@ public class MainFragment extends Fragment {
     private final String TAG = this.getClass().getSimpleName();
 
     private GridView gridView;
+    private View rootView;
 
     private MoviesGridAdapter moviesAdapter;
 
@@ -60,8 +65,8 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
-        gridView = (GridView) view.findViewById(R.id.grid_for_movies);
+        rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        gridView = (GridView) rootView.findViewById(R.id.grid_for_movies);
 
         moviesAdapter = new MoviesGridAdapter(getActivity(), new ArrayList<MovieInfo>());
         gridView.setAdapter(moviesAdapter);
@@ -75,8 +80,13 @@ public class MainFragment extends Fragment {
             }
         });
 
-        new FetchMoviesTask().execute(POPULAR);
-        return view;
+        if (NetWorkUtils.isNetWorkAvailable(getActivity())) {
+            new FetchMoviesTask().execute(POPULAR);
+        } else {
+            make(rootView, getString(R.string.network_ont_connected), Snackbar.LENGTH_LONG).show();
+//            Toast.makeText(getActivity(), "NetWork not connected.", Toast.LENGTH_LONG).show();
+        }
+        return rootView;
     }
 
     @Override
@@ -95,6 +105,11 @@ public class MainFragment extends Fragment {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    /**
+     * 弹出
+     */
+
 
     /**
      * @String 参数
@@ -154,7 +169,9 @@ public class MainFragment extends Fragment {
                 InputStream inputStream = urlConnection.getInputStream();
                 StringBuffer buffer = new StringBuffer();
                 if (inputStream == null) {
-                    // 网络或服务器问题,没有返回
+
+                    Log.e(TAG, "inputStream null");
+                    // 没有返回
                     return null;
                 }
 
@@ -165,13 +182,13 @@ public class MainFragment extends Fragment {
                 String line;
                 while ((line = reader.readLine()) != null) {
 
-
                     Log.i(TAG, line);
                     buffer.append(line + "\n");
                 }
 
                 if (buffer.length() == 0) {
                     // 返回的数据为空
+                    Log.e(TAG, "inputStreamReader null");
                     return null;
                 }
 
@@ -181,6 +198,21 @@ public class MainFragment extends Fragment {
                 return null;
             } catch (IOException e) {
                 Log.e(TAG, "IOException", e);
+                Snackbar snackbar = null;
+                if (!NetWorkUtils.isOnline()) {
+                    snackbar = Snackbar.make(rootView, getString(R.string.internet_not_connected), Snackbar.LENGTH_INDEFINITE);
+                    snackbar.setAction(getString(R.string.try_again), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new FetchMoviesTask().execute(TOP_RATED);
+                        }
+                    });
+                    snackbar.show();
+                } else {
+                    if (snackbar != null) {
+                        snackbar.dismiss();
+                    }
+                }
                 return null;
             } finally {
                 if (urlConnection != null) {

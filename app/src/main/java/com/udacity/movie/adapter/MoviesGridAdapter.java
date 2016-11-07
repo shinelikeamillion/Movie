@@ -1,4 +1,4 @@
-package com.udacity.moviestepone.adapter;
+package com.udacity.movie.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -8,8 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
-import com.udacity.moviestepone.R;
-import com.udacity.moviestepone.model.MovieInfo;
+import com.udacity.movie.R;
+import com.udacity.movie.model.MovieInfo;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package com.udacity.moviestepone.fragment;
+package com.udacity.movie.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,8 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.udacity.moviestepone.R;
-import com.udacity.moviestepone.model.MovieInfo;
+import com.udacity.movie.R;
+import com.udacity.movie.model.MovieInfo;
 
 /**
  * 电影详情页
