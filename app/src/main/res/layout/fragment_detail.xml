@@ -46,6 +46,11 @@
             android:layout_toRightOf="@id/iv_movie_poster"
             android:layout_below="@id/tv_movie_vote_count" />
 
+        <TextView
+            android:id="@+id/tv_mark"
+            style="@style/TextViewBody2Style"
+            android:text="Mark as favorite"/>
+
     </RelativeLayout>
 
     <TextView
