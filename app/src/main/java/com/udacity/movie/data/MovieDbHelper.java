@@ -2,8 +2,8 @@ package com.udacity.movie.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.udacity.movie.data.MovieContract.MovieEntry;
 
@@ -12,6 +12,7 @@ import com.udacity.movie.data.MovieContract.MovieEntry;
  */
 
 public class MovieDbHelper extends SQLiteOpenHelper {
+    final String TAG = this.getClass().getSimpleName();
 
     /** 改变数据结构的时候需要增加版本
      */
@@ -29,17 +30,18 @@ public class MovieDbHelper extends SQLiteOpenHelper {
             + MovieEntry.COLUMN_LENGTH + " INTEGER NOT NULL, "
             + MovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, "
             + MovieEntry.COLUMN_POPUlARITY + " REAL NOT NULL, "
-            + MovieEntry.COLUMN_OVERVIEW + "TEXT NOT NULL, "
+            + MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, "
             + "UNIQUE ("+ MovieEntry.COLUMN_MOVIE_ID +") ON CONFLICT REPLACE"
             + " );";
 
-    public MovieDbHelper(Context context, String name, CursorFactory factory, int version) {
-        super(context, DATABASE_NAME, factory, DATABASE_VERSION);
+    public MovieDbHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_MOVIE_TABLE);
+        Log.i(TAG, "创建数据库...");
     }
 
     @Override
@@ -47,5 +49,6 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         // 因为只是缓存网络数据,下面这行代码会删除已存在的数据库版本, 如果不想删除,注释掉紧跟着的这一行。
         db.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
         onCreate(db);
+        Log.i(TAG, "更新数据库...");
     }
 }
