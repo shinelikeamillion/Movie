@@ -4,7 +4,23 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by ten-thousand-hours on 10/24/16.
+ * 电影属性
+ * {
+ *  "poster_path":"\/xfWac8MTYDxujaxgPVcRD9yZaul.jpg",
+ *  "adult":false,
+ *  "overview":"After his career is destroyed, a brilliant but arrogant surgeon gets a new lease on life when a sorcerer takes him under his wing and trains him to defend the world against evil.",
+ *  "release_date":"2016-10-25",
+ *  "genre_ids":[28,12,14,878],
+ *  "id":284052,
+ *  "original_title":"Doctor Strange",
+ *  "original_language":"en",
+ *  "title":"Doctor Strange",
+ *  "backdrop_path":"\/tFI8VLMgSTTU38i8TIsklfqS9Nl.jpg",
+ *  "popularity":47.95732,
+ *  "vote_count":1055,
+ *  "video":false,
+ *  "vote_average":6.63
+ * }
  */
 
 public class MovieInfo implements Parcelable{
