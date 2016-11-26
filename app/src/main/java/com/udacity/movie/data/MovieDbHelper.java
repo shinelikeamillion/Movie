@@ -31,6 +31,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
             + MovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, "
             + MovieEntry.COLUMN_POPUlARITY + " REAL NOT NULL, "
             + MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, "
+            + MovieEntry.COLUMN_FAVORED + " INTEGER NOT NULL, "
             + "UNIQUE ("+ MovieEntry.COLUMN_MOVIE_ID +") ON CONFLICT REPLACE"
             + " );";
 
