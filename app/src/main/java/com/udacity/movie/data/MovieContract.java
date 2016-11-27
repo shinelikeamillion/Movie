@@ -44,7 +44,23 @@ public class MovieContract {
 
         public static Uri buildMovieFavored () {
             return BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE)
-                    .appendPath(String.valueOf(MovieProvider.MOVIE_FAVORED)).build();
+                    .appendPath("movies_favored").build();
+        }
+
+        public static Uri buildMovieIdWithFavored (int movieId, int favored) {
+            return BASE_CONTENT_URI.buildUpon()
+                    .appendPath(PATH_MOVIE)
+                    .appendPath(Integer.toString(movieId))
+                    .appendPath(Integer.toString(favored))
+                    .build();
+        }
+
+        public static Integer getFavoredFromUri (Uri uri) {
+            return Integer.parseInt(uri.getPathSegments().get(2));
+        }
+
+        public static int getMovieIdFromUri (Uri uri) {
+            return Integer.parseInt(uri.getPathSegments().get(1));
         }
     }
 

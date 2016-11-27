@@ -83,8 +83,7 @@ public class MainFragment extends Fragment {
         if (NetWorkUtils.isNetWorkAvailable(getActivity())) {
             new FetchMoviesTask().execute(POPULAR);
         } else {
-            make(rootView, getString(R.string.network_ont_connected), Snackbar.LENGTH_LONG).show();
-//            Toast.makeText(getActivity(), "NetWork not connected.", Toast.LENGTH_LONG).show();
+            Snackbar.make(rootView, getString(R.string.network_ont_connected), Snackbar.LENGTH_LONG).show();
         }
         return rootView;
     }
@@ -105,11 +104,6 @@ public class MainFragment extends Fragment {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    /**
-     * 弹出
-     */
-
 
     /**
      * @String 参数
@@ -200,7 +194,7 @@ public class MainFragment extends Fragment {
                 Log.e(TAG, "IOException", e);
                 Snackbar snackbar = null;
                 if (!NetWorkUtils.isOnline()) {
-                    snackbar = Snackbar.make(rootView, getString(R.string.internet_not_connected), Snackbar.LENGTH_INDEFINITE);
+                    snackbar = make(rootView, getString(R.string.internet_not_connected), Snackbar.LENGTH_INDEFINITE);
                     snackbar.setAction(getString(R.string.try_again), new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {

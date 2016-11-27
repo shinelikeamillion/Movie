@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.udacity.movie.data.MovieContract.MovieEntry;
 
@@ -19,18 +20,23 @@ public class MovieProvider extends ContentProvider {
     private MovieDbHelper movieDbHelper;
     private SQLiteDatabase db;
 
-    static final int MOVIE = 100;
-    static final int MOVIE_FAVORED = 102;
+    static final int MOVIES = 100;
+    static final int MOVIE_ID = 102;
+    static final int MOVIES_FAVORED = 103;
 
-    // movie.favored
-    private static final String sFavoredSelection = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_FAVORED + " = " + 1;
+    // movie.favored == 1
+    private static final String sFavoredSelection = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_FAVORED + " = 1";
+
+    // movie.movie_id = ?
+    private static final String sMovieIdSelection = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID + " = ?";
 
     static UriMatcher buildUriMather () {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = MovieContract.CONTENT_AUTHORITY;
 
-        matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIE);
-        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/" +MOVIE_FAVORED, MOVIE_FAVORED);
+        matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIES);
+        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/#/*", MOVIE_ID);
+        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/movies_favored", MOVIES_FAVORED);
 
         return matcher;
     }
@@ -47,7 +53,7 @@ public class MovieProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor retCursor;
         switch (sUriMather.match(uri)) {
-            case MOVIE: {
+            case MOVIES: {
                 retCursor = db.query(
                         MovieEntry.TABLE_NAME,
                         projection,
@@ -59,7 +65,7 @@ public class MovieProvider extends ContentProvider {
                 );
                 break;
             }
-            case MOVIE_FAVORED: {
+            case MOVIES_FAVORED: {
                 retCursor = db.query(
                         MovieEntry.TABLE_NAME,
                         projection,
@@ -81,13 +87,15 @@ public class MovieProvider extends ContentProvider {
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
-
+        Log.e("TTag", uri.toString());
         final int match = sUriMather.match(uri);
 
         switch (match) {
-            case MOVIE:
-            case MOVIE_FAVORED:
+            case MOVIES:
+            case MOVIES_FAVORED:
                 return MovieEntry.CONTENT_TYPE;
+            case MOVIE_ID:
+                return MovieEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("unKnown uri:" + uri);
         }
@@ -101,16 +109,7 @@ public class MovieProvider extends ContentProvider {
         Uri returnUri = null;
 
         switch (match) {
-            case MOVIE: {
-                long _id = db.insert(MovieEntry.TABLE_NAME, null, values);
-                if (_id > 0) {
-                    returnUri = MovieEntry.buildMovieUri(_id);
-                } else {
-                    throw new UnsupportedOperationException("Insert 错误: " + uri);
-                }
-                break;
-            }
-            case MOVIE_FAVORED: {
+            case MOVIES: {
                 long _id = db.insert(MovieEntry.TABLE_NAME, null, values);
                 if (_id > 0) {
                     returnUri = MovieEntry.buildMovieUri(_id);
@@ -130,7 +129,7 @@ public class MovieProvider extends ContentProvider {
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
         final int match = sUriMather.match(uri);
         switch (match) {
-            case MOVIE:
+            case MOVIES:
                 db.beginTransaction();
                 int returnCount = 0;
                 try {
@@ -160,7 +159,7 @@ public class MovieProvider extends ContentProvider {
 
         if (null == selection) selection = "1";
         switch (match) {
-            case MOVIE:
+            case MOVIES:
                 rowsDeleted = db.delete(
                         MovieEntry.TABLE_NAME,
                         selection,
@@ -185,7 +184,8 @@ public class MovieProvider extends ContentProvider {
         int rowsUpdated;
 
         switch (match) {
-            case MOVIE:
+            case MOVIES:
+            case MOVIE_ID:
                 rowsUpdated = db.update(
                         MovieEntry.TABLE_NAME,
                         values,
@@ -193,6 +193,17 @@ public class MovieProvider extends ContentProvider {
                         selectionArgs
                 );
                 break;
+//                Integer movieId = MovieEntry.getMovieIdFromUri(uri);
+//                Integer favored = MovieEntry.getFavoredFromUri(uri);
+//                values = new ContentValues();
+//                values.put(MovieEntry.COLUMN_FAVORED, favored);
+//                rowsUpdated = db.update(
+//                        MovieEntry.TABLE_NAME,
+//                        values,
+//                        sMovieIdSelection,
+//                        new String[] {Integer.toString(movieId)}
+//                );
+//                break;
             default:
                 throw new UnsupportedOperationException("Uri 错误: "+uri);
         }
