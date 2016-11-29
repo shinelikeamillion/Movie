@@ -25,6 +25,7 @@ import com.udacity.movie.R;
 import com.udacity.movie.activity.DetailActivity;
 import com.udacity.movie.adapter.MoviesGridAdapter;
 import com.udacity.movie.data.MovieContract.MovieEntry;
+import com.udacity.movie.model.MovieInfo;
 import com.udacity.movie.task.FetchMovieTask;
 import com.udacity.movie.utils.NetWorkUtils;
 
@@ -35,6 +36,16 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
     private final String TAG = this.getClass().getSimpleName();
     private static final int FORECAST_LOADER = 0;
 
+    static final int COL_MOVIE_ID = 0+1;
+    static final int COL_MOVIE_ORIGINAL_TITLE = 1+1;
+    static final int COL_MOVIE_RELEASE_DATE = 2+1;
+    static final int COL_MOVIE_POSTER_PATH = 3+1;
+    static final int COL_MOVIE_VOTE_AVERAGE = 4+1;
+    static final int COL_MOVIE_POPUlARITY = 5+1;
+    static final int COL_MOVIE_LENGTH = 6+1;
+    static final int COL_MOVIE_OVERVIEW = 7+1;
+    static final int COL_MOVIE_FAVORE = 8+1;
+
     private GridView gridView;
     private View rootView;
 
@@ -42,6 +53,7 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
 
     private final String TOP_RATED = "top_rated";
     private final String POPULAR = "popular";
+    private String sortOrder;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,8 +73,29 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
-//                intent.putExtra(Intent.EXTRA_RETURN_RESULT, moviesAdapter.getItem(position));
+                MovieInfo movieInfo = null;
+                if (cursor != null) {
+                    movieInfo = new MovieInfo(
+                            cursor.getString(COL_MOVIE_POSTER_PATH),
+                            "",
+                            cursor.getString(COL_MOVIE_OVERVIEW),
+                            cursor.getString(COL_MOVIE_RELEASE_DATE),
+                            null,
+                            cursor.getInt(COL_MOVIE_ID),
+                            cursor.getString(COL_MOVIE_ORIGINAL_TITLE),
+                            "",
+                            cursor.getString(COL_MOVIE_ORIGINAL_TITLE),
+                            "",
+                            cursor.getFloat(COL_MOVIE_POPUlARITY),
+                            0,
+                            false,
+                            cursor.getInt(COL_MOVIE_VOTE_AVERAGE)
+                    );
+                }
+                intent.putExtra(Intent.EXTRA_RETURN_RESULT, movieInfo);
                 startActivity(intent);
             }
         });
@@ -90,17 +123,16 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        Bundle bundle = new Bundle();
         if (id == R.id.action_most_popular) {
             updateMovie(POPULAR);
-            bundle.putString("sortOrder", POPULAR);
+            sortOrder = MovieEntry.COLUMN_POPUlARITY + " DESC"; // Descending, by popularity
         } else if (id == R.id.action_top_rated) {
             updateMovie(TOP_RATED);
-            bundle.putString("sortOrder", TOP_RATED);
+            sortOrder = MovieEntry.COLUMN_POPUlARITY + " DESC"; // Descending, by popularity
         }
         getLoaderManager().restartLoader(
                 FORECAST_LOADER,
-                bundle,
+                null,
                 this);
         return super.onOptionsItemSelected(item);
     }
@@ -113,10 +145,6 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.e(TAG, "onCreateLoader");
-        String sortOrder = MovieEntry.COLUMN_POPUlARITY + " DESC"; // Descending, by popularity
-        if (args != null || args.getString("sortOrder").equals(TOP_RATED)) {
-            sortOrder = MovieEntry.COLUMN_VOTE_AVERAGE + " DESC";
-        }
         Uri movieUri = MovieEntry.CONTENT_URI;
         return new CursorLoader(
                 getActivity(),
