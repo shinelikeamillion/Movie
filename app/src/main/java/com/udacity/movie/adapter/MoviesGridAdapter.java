@@ -1,53 +1,61 @@
 package com.udacity.movie.adapter;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.movie.R;
-import com.udacity.movie.model.MovieInfo;
-
-import java.util.ArrayList;
+import com.udacity.movie.data.MovieContract.MovieEntry;
 
 /**
  * 主页电影信息适配器
  */
 
-public class MoviesGridAdapter extends ArrayAdapter<MovieInfo>{
+public class MoviesGridAdapter extends CursorAdapter {
 
     private final String TAG = this.getClass().getSimpleName();
     ViewGroup.LayoutParams layoutParams;
-    private Context context;
 
-    public MoviesGridAdapter(Context context, ArrayList<MovieInfo> movieInfos) {
-        super(context, 0, movieInfos);
-        this.context = context;
+    private static class ViewHolder {
+        private final ImageView imgPoster;
+
+        ViewHolder (ImageView view) {
+            imgPoster = view;
+        }
     }
 
-    @NonNull
+    public MoviesGridAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
+    }
+
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        Log.e(TAG, "newView");
 
-        MovieInfo movieInfo = getItem(position);
 
-        if (convertView == null) {
-            ImageView imageView = new ImageView(context);
-            convertView = imageView;
-            layoutParams = new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    (int) context.getResources().getDimension(R.dimen.poster_height));
-            convertView.setLayoutParams(layoutParams);
-            ((ImageView)convertView).setScaleType(ImageView.ScaleType.CENTER_CROP);
-        }
+        ImageView imageView = new ImageView(context);
+        layoutParams = new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                (int) context.getResources().getDimension(R.dimen.poster_height));
+        imageView.setLayoutParams(layoutParams);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
+        ViewHolder viewHolder = new ViewHolder(imageView);
+        imageView.setTag(viewHolder);
+
+        return imageView;
+    }
+
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
         Picasso.with(context)
-                .load(movieInfo.poster_path)
-                .into((ImageView) convertView);
-
-        return convertView;
+                .load("http://image.tmdb.org/t/p/w185"+cursor.getString(cursor.getColumnIndex(MovieEntry.COLUMN_POSTER_PATH)))
+                .into(viewHolder.imgPoster);
     }
 }

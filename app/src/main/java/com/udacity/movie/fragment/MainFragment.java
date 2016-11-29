@@ -2,13 +2,15 @@ package com.udacity.movie.fragment;
 
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,34 +21,19 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import com.udacity.movie.BuildConfig;
 import com.udacity.movie.R;
 import com.udacity.movie.activity.DetailActivity;
 import com.udacity.movie.adapter.MoviesGridAdapter;
-import com.udacity.movie.model.MovieInfo;
-import com.udacity.movie.model.MovieResults;
+import com.udacity.movie.data.MovieContract.MovieEntry;
+import com.udacity.movie.task.FetchMovieTask;
 import com.udacity.movie.utils.NetWorkUtils;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-
-import static android.support.design.widget.Snackbar.make;
 
 /**
  */
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
 
     private final String TAG = this.getClass().getSimpleName();
+    private static final int FORECAST_LOADER = 0;
 
     private GridView gridView;
     private View rootView;
@@ -68,24 +55,30 @@ public class MainFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
         gridView = (GridView) rootView.findViewById(R.id.grid_for_movies);
 
-        moviesAdapter = new MoviesGridAdapter(getActivity(), new ArrayList<MovieInfo>());
+        moviesAdapter = new MoviesGridAdapter(getActivity(), null, 0);
         gridView.setAdapter(moviesAdapter);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtra(Intent.EXTRA_RETURN_RESULT, moviesAdapter.getItem(position));
+//                intent.putExtra(Intent.EXTRA_RETURN_RESULT, moviesAdapter.getItem(position));
                 startActivity(intent);
             }
         });
 
         if (NetWorkUtils.isNetWorkAvailable(getActivity())) {
-            new FetchMoviesTask().execute(POPULAR);
+            new FetchMovieTask(getActivity()).execute(POPULAR);
         } else {
             Snackbar.make(rootView, getString(R.string.network_ont_connected), Snackbar.LENGTH_LONG).show();
         }
         return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        getLoaderManager().initLoader(FORECAST_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -97,202 +90,242 @@ public class MainFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        Bundle bundle = new Bundle();
         if (id == R.id.action_most_popular) {
-            new FetchMoviesTask().execute(POPULAR);
+            updateMovie(POPULAR);
+            bundle.putString("sortOrder", POPULAR);
         } else if (id == R.id.action_top_rated) {
-            new FetchMoviesTask().execute(TOP_RATED);
+            updateMovie(TOP_RATED);
+            bundle.putString("sortOrder", TOP_RATED);
         }
+        getLoaderManager().restartLoader(
+                FORECAST_LOADER,
+                bundle,
+                this);
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateMovie (String choice) {
+        FetchMovieTask movieTask = new FetchMovieTask(getActivity());
+        movieTask.execute(choice);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.e(TAG, "onCreateLoader");
+        String sortOrder = MovieEntry.COLUMN_POPUlARITY + " DESC"; // Descending, by popularity
+        if (args != null || args.getString("sortOrder").equals(TOP_RATED)) {
+            sortOrder = MovieEntry.COLUMN_VOTE_AVERAGE + " DESC";
+        }
+        Uri movieUri = MovieEntry.CONTENT_URI;
+        return new CursorLoader(
+                getActivity(),
+                movieUri,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        moviesAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        moviesAdapter.swapCursor(null);
     }
 
     /**
      * @String 参数
      */
-    public class FetchMoviesTask extends AsyncTask<String, Void, MovieResults> {
-
-        private final String TAG = this.getClass().getSimpleName();
-
-        @Override
-        protected MovieResults doInBackground(String... params) {
-
-            //没有参数,直接跳过
-            if (params.length == 0) {
-                return null;
-            }
-            return getMovies(params[0]);
-        }
-
-        @Override
-        protected void onPostExecute(MovieResults movieResults) {
-            if (movieResults != null) {
-                moviesAdapter.clear();
-                if (Build.VERSION.SDK_INT > 11) {
-                    moviesAdapter.addAll(movieResults.results);
-                } else {
-                    for (MovieInfo movieInfo : movieResults.results) {
-                        moviesAdapter.add(movieInfo);
-                    }
-                    moviesAdapter.notifyDataSetChanged();
-                }
-            }
-        }
-
-        private MovieResults getMovies (String choice) {
-            final String MVDB_BASE_URL = "https://api.themoviedb.org/3/movie/"+choice+"?";
-            final String APPID_PARAM = "api_key";
-
-            Uri buildUri = Uri.parse(MVDB_BASE_URL)
-                    .buildUpon()
-                    .appendQueryParameter(APPID_PARAM, BuildConfig.THE_MOVIE_DB_API_KEY)
-                    .build();
-            Log.e(TAG, "URL: "+buildUri.toString());
-
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            String moviesJSONStr = null;
-
-            try {
-                // 1. 打开连接
-                URL url = new URL(buildUri.toString());
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                // 2. 获取数据流
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-
-                    Log.e(TAG, "inputStream null");
-                    // 没有返回
-                    return null;
-                }
-
-                // 3. 读取响应值
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                reader = new BufferedReader(inputStreamReader);
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-
-                    Log.i(TAG, line);
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // 返回的数据为空
-                    Log.e(TAG, "inputStreamReader null");
-                    return null;
-                }
-
-                moviesJSONStr = buffer.toString();
-            } catch (MalformedURLException e) {
-                Log.e(TAG, "MalformedURL failed", e);
-                return null;
-            } catch (IOException e) {
-                Log.e(TAG, "IOException", e);
-                Snackbar snackbar = null;
-                if (!NetWorkUtils.isOnline()) {
-                    snackbar = make(rootView, getString(R.string.internet_not_connected), Snackbar.LENGTH_INDEFINITE);
-                    snackbar.setAction(getString(R.string.try_again), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            new FetchMoviesTask().execute(TOP_RATED);
-                        }
-                    });
-                    snackbar.show();
-                } else {
-                    if (snackbar != null) {
-                        snackbar.dismiss();
-                    }
-                }
-                return null;
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        Log.e(TAG, "Error closing reader Stream", e);
-                    }
-                }
-            }
-
-            try {
-               return getMoviesFromjSONStr(moviesJSONStr);
-            } catch (JSONException e) {
-                Log.e(TAG, "JSON 解析出错"+e.getMessage(), e);
-            }
-
-            // 只有解析出错的时候才会走到这里来
-            return null;
-        }
-
-        // 从jSON字符中解析出我们需要的数据
-        private MovieResults getMoviesFromjSONStr (String moviesjSONStr) throws JSONException {
-            // 提取所需要的JSON对象的键名
-            final String MR_PAGE = "page";
-            final String MR_TOTAL_PAGES = "total_pages";
-            final String MR_TOTAL_RESULTS = "total_results";
-            final String MR_RESULTS = "results";
-
-            final String M_POSTER_PATH = "poster_path";
-            final String M_ADULT = "adult";
-            final String M_OVERVIEW = "overview";
-            final String M_RELEASE_DATE = "release_date";
-            final String M_GENRE_IDS = "genre_ids";
-            final String M_ID = "id";
-            final String M_ORIGINAL_TITLE = "original_title";
-            final String M_ORIGINAL_LANGUAGE = "original_language";
-            final String M_TITLE = "title";
-            final String M_BACKDROP_PATH = "backdrop_path";
-            final String M_POPULARITY = "popularity";
-            final String M_VOTE_COUNT = "vote_count";
-            final String M_VIDEO = "video";
-            final String M_VOTE_AVERAGE = "vote_average";
-
-            JSONObject moviesResultJson = new JSONObject(moviesjSONStr);
-            JSONArray movieArray = moviesResultJson.getJSONArray(MR_RESULTS);
-
-            MovieResults moviesResult = new MovieResults();
-            moviesResult.page = moviesResultJson.getInt(MR_PAGE);
-            moviesResult.total_pages = moviesResultJson.getInt(MR_TOTAL_PAGES);
-            moviesResult.total_results = moviesResultJson.getInt(MR_TOTAL_RESULTS);
-            moviesResult.results = new ArrayList<>();
-
-            for (int i = 0 ; i < movieArray.length(); i++) {
-                JSONObject movieJson = movieArray.getJSONObject(i);
-                JSONArray genre_ids = movieJson.getJSONArray(M_GENRE_IDS);
-
-                int[] ids = new int[genre_ids.length()];
-                for (int j = 0; j < genre_ids.length(); j++) {
-                    ids[j] = genre_ids.getInt(j);
-                }
-
-                MovieInfo movie = new MovieInfo(
-                        movieJson.getString(M_POSTER_PATH),
-                        movieJson.getString(M_ADULT),
-                        movieJson.getString(M_OVERVIEW),
-                        movieJson.getString(M_RELEASE_DATE),
-                        ids,
-                        movieJson.getInt(M_ID),
-                        movieJson.getString(M_ORIGINAL_TITLE),
-                        movieJson.getString(M_ORIGINAL_LANGUAGE),
-                        movieJson.getString(M_TITLE),
-                        movieJson.getString(M_BACKDROP_PATH),
-                        Float.parseFloat(movieJson.getString(M_POPULARITY)),
-                        movieJson.getInt(M_VOTE_COUNT),
-                        movieJson.getBoolean(M_VIDEO),
-                        movieJson.getInt(M_VOTE_AVERAGE));
-
-                moviesResult.results.add(movie);
-//                Log.e(TAG, "电影"+i+" : "+ movie.toString());
-            }
-            return moviesResult;
-        }
-    }
+//    public class FetchMoviesTask extends AsyncTask<String, Void, MovieResults> {
+//
+//        private final String TAG = this.getClass().getSimpleName();
+//
+//        @Override
+//        protected MovieResults doInBackground(String... params) {
+//
+//            //没有参数,直接跳过
+//            if (params.length == 0) {
+//                return null;
+//            }
+//            return getMovies(params[0]);
+//        }
+//
+//        @Override
+//        protected void onPostExecute(MovieResults movieResults) {
+//            if (movieResults != null) {
+//                moviesAdapter.clear();
+//                if (Build.VERSION.SDK_INT > 11) {
+//                    moviesAdapter.addAll(movieResults.results);
+//                } else {
+//                    for (MovieInfo movieInfo : movieResults.results) {
+//                        moviesAdapter.add(movieInfo);
+//                    }
+//                    moviesAdapter.notifyDataSetChanged();
+//                }
+//            }
+//        }
+//
+//        private MovieResults getMovies (String choice) {
+//            final String MVDB_BASE_URL = "https://api.themoviedb.org/3/movie/"+choice+"?";
+//            final String APPID_PARAM = "api_key";
+//
+//            Uri buildUri = Uri.parse(MVDB_BASE_URL)
+//                    .buildUpon()
+//                    .appendQueryParameter(APPID_PARAM, BuildConfig.THE_MOVIE_DB_API_KEY)
+//                    .build();
+//            Log.e(TAG, "URL: "+buildUri.toString());
+//
+//            HttpURLConnection urlConnection = null;
+//            BufferedReader reader = null;
+//
+//            String moviesJSONStr = null;
+//
+//            try {
+//                // 1. 打开连接
+//                URL url = new URL(buildUri.toString());
+//                urlConnection = (HttpURLConnection) url.openConnection();
+//                urlConnection.setRequestMethod("GET");
+//                urlConnection.connect();
+//
+//                // 2. 获取数据流
+//                InputStream inputStream = urlConnection.getInputStream();
+//                StringBuffer buffer = new StringBuffer();
+//                if (inputStream == null) {
+//
+//                    Log.e(TAG, "inputStream null");
+//                    // 没有返回
+//                    return null;
+//                }
+//
+//                // 3. 读取响应值
+//                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+//                reader = new BufferedReader(inputStreamReader);
+//
+//                String line;
+//                while ((line = reader.readLine()) != null) {
+//
+//                    Log.i(TAG, line);
+//                    buffer.append(line + "\n");
+//                }
+//
+//                if (buffer.length() == 0) {
+//                    // 返回的数据为空
+//                    Log.e(TAG, "inputStreamReader null");
+//                    return null;
+//                }
+//
+//                moviesJSONStr = buffer.toString();
+//            } catch (MalformedURLException e) {
+//                Log.e(TAG, "MalformedURL failed", e);
+//                return null;
+//            } catch (IOException e) {
+//                Log.e(TAG, "IOException", e);
+//                Snackbar snackbar = null;
+//                if (!NetWorkUtils.isOnline()) {
+//                    snackbar = make(rootView, getString(R.string.internet_not_connected), Snackbar.LENGTH_INDEFINITE);
+//                    snackbar.setAction(getString(R.string.try_again), new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            new FetchMoviesTask().execute(TOP_RATED);
+//                        }
+//                    });
+//                    snackbar.show();
+//                } else {
+//                    if (snackbar != null) {
+//                        snackbar.dismiss();
+//                    }
+//                }
+//                return null;
+//            } finally {
+//                if (urlConnection != null) {
+//                    urlConnection.disconnect();
+//                }
+//                if (reader != null) {
+//                    try {
+//                        reader.close();
+//                    } catch (IOException e) {
+//                        Log.e(TAG, "Error closing reader Stream", e);
+//                    }
+//                }
+//            }
+//
+//            try {
+//               return getMoviesFromjSONStr(moviesJSONStr);
+//            } catch (JSONException e) {
+//                Log.e(TAG, "JSON 解析出错"+e.getMessage(), e);
+//            }
+//
+//            // 只有解析出错的时候才会走到这里来
+//            return null;
+//        }
+//
+//        // 从jSON字符中解析出我们需要的数据
+//        private MovieResults getMoviesFromjSONStr (String moviesjSONStr) throws JSONException {
+//            // 提取所需要的JSON对象的键名
+//            final String MR_PAGE = "page";
+//            final String MR_TOTAL_PAGES = "total_pages";
+//            final String MR_TOTAL_RESULTS = "total_results";
+//            final String MR_RESULTS = "results";
+//
+//            final String M_POSTER_PATH = "poster_path";
+//            final String M_ADULT = "adult";
+//            final String M_OVERVIEW = "overview";
+//            final String M_RELEASE_DATE = "release_date";
+//            final String M_GENRE_IDS = "genre_ids";
+//            final String M_ID = "id";
+//            final String M_ORIGINAL_TITLE = "original_title";
+//            final String M_ORIGINAL_LANGUAGE = "original_language";
+//            final String M_TITLE = "title";
+//            final String M_BACKDROP_PATH = "backdrop_path";
+//            final String M_POPULARITY = "popularity";
+//            final String M_VOTE_COUNT = "vote_count";
+//            final String M_VIDEO = "video";
+//            final String M_VOTE_AVERAGE = "vote_average";
+//
+//            JSONObject moviesResultJson = new JSONObject(moviesjSONStr);
+//            JSONArray movieArray = moviesResultJson.getJSONArray(MR_RESULTS);
+//
+//            MovieResults moviesResult = new MovieResults();
+//            moviesResult.page = moviesResultJson.getInt(MR_PAGE);
+//            moviesResult.total_pages = moviesResultJson.getInt(MR_TOTAL_PAGES);
+//            moviesResult.total_results = moviesResultJson.getInt(MR_TOTAL_RESULTS);
+//            moviesResult.results = new ArrayList<>();
+//
+//            for (int i = 0 ; i < movieArray.length(); i++) {
+//                JSONObject movieJson = movieArray.getJSONObject(i);
+//                JSONArray genre_ids = movieJson.getJSONArray(M_GENRE_IDS);
+//
+//                int[] ids = new int[genre_ids.length()];
+//                for (int j = 0; j < genre_ids.length(); j++) {
+//                    ids[j] = genre_ids.getInt(j);
+//                }
+//
+//                MovieInfo movie = new MovieInfo(
+//                        movieJson.getString(M_POSTER_PATH),
+//                        movieJson.getString(M_ADULT),
+//                        movieJson.getString(M_OVERVIEW),
+//                        movieJson.getString(M_RELEASE_DATE),
+//                        ids,
+//                        movieJson.getInt(M_ID),
+//                        movieJson.getString(M_ORIGINAL_TITLE),
+//                        movieJson.getString(M_ORIGINAL_LANGUAGE),
+//                        movieJson.getString(M_TITLE),
+//                        movieJson.getString(M_BACKDROP_PATH),
+//                        Float.parseFloat(movieJson.getString(M_POPULARITY)),
+//                        movieJson.getInt(M_VOTE_COUNT),
+//                        movieJson.getBoolean(M_VIDEO),
+//                        movieJson.getInt(M_VOTE_AVERAGE));
+//
+//                moviesResult.results.add(movie);
+////                Log.e(TAG, "电影"+i+" : "+ movie.toString());
+//            }
+//            return moviesResult;
+//        }
+//    }
 
 }
