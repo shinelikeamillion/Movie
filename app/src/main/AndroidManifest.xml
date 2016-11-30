@@ -20,7 +20,8 @@
             android:enabled="true"
             android:exported="false"
             android:syncable="true"/>
-        <activity android:name="com.udacity.movie.activity.MainActivity">
+        <activity android:name="com.udacity.movie.activity.MainActivity"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -9,6 +9,7 @@ import com.udacity.movie.R;
 public class MainActivity extends AppCompatActivity {
 
     private final String TAG= this.getClass().getSimpleName();
+    private final String MOVIE_FRAGMENT_TAG = "FFTAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.container, new MainFragment())
+                    .add(R.id.container, new MainFragment(), MOVIE_FRAGMENT_TAG)
                     .commit();
         }
     }

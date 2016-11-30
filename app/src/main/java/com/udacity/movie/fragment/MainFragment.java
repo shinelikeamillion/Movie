@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ListView;
 
 import com.udacity.movie.R;
 import com.udacity.movie.activity.DetailActivity;
@@ -35,6 +36,10 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
 
     private final String TAG = this.getClass().getSimpleName();
     private static final int FORECAST_LOADER = 0;
+
+    // 记住滚动位置
+    private static final String SELECTED_KEY = "selected_position";
+    private int mPosition = GridView.INVALID_POSITION;
 
     static final int COL_MOVIE_ID = 0+1;
     static final int COL_MOVIE_ORIGINAL_TITLE = 1+1;
@@ -97,14 +102,22 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
                 }
                 intent.putExtra(Intent.EXTRA_RETURN_RESULT, movieInfo);
                 startActivity(intent);
+
+                mPosition = position;
             }
         });
 
         if (NetWorkUtils.isNetWorkAvailable(getActivity())) {
-            new FetchMovieTask(getActivity()).execute(POPULAR);
+//            new FetchMovieTask(getActivity()).execute(POPULAR);
         } else {
             Snackbar.make(rootView, getString(R.string.network_ont_connected), Snackbar.LENGTH_LONG).show();
         }
+
+        if (null != savedInstanceState &&
+                savedInstanceState.containsKey(SELECTED_KEY)) {
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
+
         return rootView;
     }
 
@@ -112,6 +125,14 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         getLoaderManager().initLoader(FORECAST_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (mPosition != ListView.INVALID_POSITION) {
+            outState.putInt(SELECTED_KEY, mPosition);
+        }
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -124,10 +145,10 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_most_popular) {
-            updateMovie(POPULAR);
+//            updateMovie(POPULAR);
             sortOrder = MovieEntry.COLUMN_POPUlARITY + " DESC"; // Descending, by popularity
         } else if (id == R.id.action_top_rated) {
-            updateMovie(TOP_RATED);
+//            updateMovie(TOP_RATED);
             sortOrder = MovieEntry.COLUMN_POPUlARITY + " DESC"; // Descending, by popularity
         }
         getLoaderManager().restartLoader(
@@ -159,6 +180,9 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         moviesAdapter.swapCursor(data);
+        if (mPosition != ListView.INVALID_POSITION) {
+            gridView.smoothScrollToPosition(mPosition);
+        }
     }
 
     @Override
