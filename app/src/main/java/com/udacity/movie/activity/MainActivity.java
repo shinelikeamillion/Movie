@@ -3,8 +3,9 @@ package com.udacity.movie.activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.udacity.movie.fragment.MainFragment;
 import com.udacity.movie.R;
+import com.udacity.movie.fragment.MainFragment;
+import com.udacity.movie.sync.MovieSyncAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,5 +23,7 @@ public class MainActivity extends AppCompatActivity {
                     .add(R.id.container, new MainFragment(), MOVIE_FRAGMENT_TAG)
                     .commit();
         }
+        MovieSyncAdapter.initializeSyncAdapter(this);
     }
+
 }

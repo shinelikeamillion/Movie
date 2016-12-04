@@ -17,4 +17,8 @@
     <string name="network_ont_connected">NetWork not connected.</string>
     <string name="try_again">Try Again</string>
 
+    <!-- SyncAdapter related -->
+    <string name="sync_account_type">movie.udacity.com</string>
+    <string name="content_authority">com.udacity.movie.app</string>
+
 </resources>

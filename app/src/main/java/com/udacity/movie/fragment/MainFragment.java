@@ -27,15 +27,16 @@ import com.udacity.movie.activity.DetailActivity;
 import com.udacity.movie.adapter.MoviesGridAdapter;
 import com.udacity.movie.data.MovieContract.MovieEntry;
 import com.udacity.movie.model.MovieInfo;
-import com.udacity.movie.task.FetchMovieTask;
+import com.udacity.movie.sync.MovieSyncAdapter;
 import com.udacity.movie.utils.NetWorkUtils;
+import com.udacity.movie.utils.Utility;
 
 /**
  */
 public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
 
     private final String TAG = this.getClass().getSimpleName();
-    private static final int FORECAST_LOADER = 0;
+    private static final int MOVIE_LOADER_ID = 0;
 
     // 记住滚动位置
     private static final String SELECTED_KEY = "selected_position";
@@ -107,9 +108,7 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
             }
         });
 
-        if (NetWorkUtils.isNetWorkAvailable(getActivity())) {
-//            new FetchMovieTask(getActivity()).execute(POPULAR);
-        } else {
+        if (!NetWorkUtils.isNetWorkAvailable(getActivity())) {
             Snackbar.make(rootView, getString(R.string.network_ont_connected), Snackbar.LENGTH_LONG).show();
         }
 
@@ -123,7 +122,7 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        getLoaderManager().initLoader(FORECAST_LOADER, null, this);
+        getLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -143,24 +142,25 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_most_popular) {
-//            updateMovie(POPULAR);
-            sortOrder = MovieEntry.COLUMN_POPUlARITY + " DESC"; // Descending, by popularity
-        } else if (id == R.id.action_top_rated) {
-//            updateMovie(TOP_RATED);
-            sortOrder = MovieEntry.COLUMN_POPUlARITY + " DESC"; // Descending, by popularity
+        switch (item.getItemId()) {
+            case R.id.action_most_popular:
+                Utility.putSortOrderPreference(getActivity(), MovieEntry.COLUMN_POPUlARITY);
+                break;
+            case R.id.action_top_rated:
+                Utility.putSortOrderPreference(getActivity(), MovieEntry.COLUMN_VOTE_AVERAGE);
+                break;
         }
-        getLoaderManager().restartLoader(
-                FORECAST_LOADER,
-                null,
-                this);
+        onSortOrderChanged();
         return super.onOptionsItemSelected(item);
     }
 
-    private void updateMovie (String choice) {
-        FetchMovieTask movieTask = new FetchMovieTask(getActivity());
-        movieTask.execute(choice);
+    private void onSortOrderChanged () {
+        updateMovie();
+        getLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
+    }
+
+    private void updateMovie ( ) {
+        MovieSyncAdapter.syncImmediately(getActivity());
     }
 
     @Override
@@ -173,7 +173,7 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
                 null,
                 null,
                 null,
-                sortOrder
+                Utility.getPreferredSortOrder(getActivity()) + " DESC"
         );
     }
 

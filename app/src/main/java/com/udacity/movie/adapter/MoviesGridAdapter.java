@@ -56,6 +56,7 @@ public class MoviesGridAdapter extends CursorAdapter {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         Picasso.with(context)
                 .load("http://image.tmdb.org/t/p/w185"+cursor.getString(cursor.getColumnIndex(MovieEntry.COLUMN_POSTER_PATH)))
+                .fit()
                 .into(viewHolder.imgPoster);
     }
 }

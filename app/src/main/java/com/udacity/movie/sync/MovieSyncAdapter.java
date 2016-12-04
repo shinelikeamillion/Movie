@@ -1,15 +1,23 @@
-package com.udacity.movie.task;
+package com.udacity.movie.sync;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.content.AbstractThreadedSyncAdapter;
+import android.content.ContentProviderClient;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SyncResult;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.udacity.movie.BuildConfig;
+import com.udacity.movie.R;
 import com.udacity.movie.data.MovieContract.MovieEntry;
 import com.udacity.movie.model.MovieInfo;
 import com.udacity.movie.model.MovieResults;
+import com.udacity.movie.utils.Utility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,22 +33,50 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Vector;
 
-public class FetchMovieTask extends AsyncTask<String, Void, MovieResults> {
-    private final String TAG = this.getClass().getSimpleName();
+public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
 
-    private final Context mContext;
-    public FetchMovieTask (Context context) {
-        mContext = context;
+    public static final String TAG = MovieSyncAdapter.class.getSimpleName();
+
+    public MovieSyncAdapter(Context context, boolean autoInitialize) {
+        super(context, autoInitialize);
     }
 
     @Override
-    protected MovieResults doInBackground(String... params) {
+    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+        Log.d(TAG, "onPerformSync called.");
+        getMovies(Utility.getOrderUrlKey(getContext()));
+    }
 
-        //没有参数,直接跳过
-        if (params.length == 0) {
-            return null;
+    public static void syncImmediately (Context context) {
+        Log.d(TAG, "syncImmediately called.");
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        ContentResolver.requestSync(getSyncAccount(context), context.getString(R.string.content_authority), bundle);
+    }
+
+    public static Account getSyncAccount (Context context) {
+        AccountManager accountManager =
+                (AccountManager) context.getSystemService(context.ACCOUNT_SERVICE);
+        Account newAccount = new Account(context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
+
+        if (null == accountManager.getPassword(newAccount)) {
+            // 添加并返回一个账号,失败则报告问题
+            if ( !accountManager.addAccountExplicitly(newAccount, "", null) ) {
+                return null;
+            }
+            onAccountCreated(newAccount, context);
         }
-        return getMovies(params[0]);
+        return newAccount;
+    }
+
+    private static void onAccountCreated(Account mAccount, Context context){
+        syncImmediately(context);
+    }
+
+    public static void initializeSyncAdapter (Context context) {
+        Log.d(TAG, "initializeSyncAdapter called.");
+        getSyncAccount(context);
     }
 
     private MovieResults getMovies(String choice) {
@@ -201,7 +237,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, MovieResults> {
             ContentValues[] cvArray = new ContentValues[cVVector.size()];
             cVVector.toArray(cvArray);
 
-            inserted = mContext.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, cvArray);
+            inserted = getContext().getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, cvArray);
         }
         Log.d(TAG, "Fetch Movie Task Complete. " + inserted + " Inserted");
 
