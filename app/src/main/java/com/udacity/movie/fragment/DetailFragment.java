@@ -18,6 +18,8 @@ import com.udacity.movie.model.MovieInfo;
  */
 public class DetailFragment extends Fragment {
 
+    MovieInfo mMovieInfo;
+
     private final String TAG = this.getClass().getSimpleName();
 
     private ImageView mIvPoster;
@@ -41,14 +43,14 @@ public class DetailFragment extends Fragment {
 
         Intent intent = getActivity().getIntent();
         if (intent.hasExtra(Intent.EXTRA_RETURN_RESULT)) {
-            MovieInfo movieInfo = intent.getParcelableExtra(Intent.EXTRA_RETURN_RESULT);
+            mMovieInfo = intent.getParcelableExtra(Intent.EXTRA_RETURN_RESULT);
 
-            Picasso.with(getActivity()).load(movieInfo.poster_path).into(mIvPoster);
-            mTvTitle.setText(movieInfo.title);
-            mTvReleaseDate.setText(String.format(getResources().getString(R.string.release_date), movieInfo.release_date));
-            mTvPopularity.setText(String.format(getResources().getString(R.string.popularity), movieInfo.popularity));
-            mTvVoteCount.setText(String.format(getResources().getString(R.string.vote_count), movieInfo.vote_count));
-            mTvOverView.setText(String.format(getResources().getString(R.string.overview), movieInfo.overview));
+            Picasso.with(getActivity()).load(mMovieInfo.poster_path).into(mIvPoster);
+            mTvTitle.setText(mMovieInfo.title);
+            mTvReleaseDate.setText(String.format(getResources().getString(R.string.release_date), mMovieInfo.release_date));
+            mTvPopularity.setText(String.format(getResources().getString(R.string.popularity), mMovieInfo.popularity));
+            mTvVoteCount.setText(String.format(getResources().getString(R.string.vote_count), mMovieInfo.vote_count));
+            mTvOverView.setText(String.format(getResources().getString(R.string.overview), mMovieInfo.overview));
         }
 
         return rootView;

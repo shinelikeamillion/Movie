@@ -11,6 +11,11 @@ import android.provider.BaseColumns;
 
 public class MovieContract {
 
+    public static final String BASE_SERVER_URL = "https://api.themoviedb.org/3/movie/";
+
+    public static final String TOP_RATED = "top_rated";
+    public static final String POPULAR = "popular";
+
     public static final String CONTENT_AUTHORITY = "com.udacity.movie.app";
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://"+CONTENT_AUTHORITY);

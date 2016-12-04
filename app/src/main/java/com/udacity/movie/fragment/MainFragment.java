@@ -57,8 +57,6 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
 
     private MoviesGridAdapter moviesAdapter;
 
-    private final String TOP_RATED = "top_rated";
-    private final String POPULAR = "popular";
     private String sortOrder;
 
     @Override

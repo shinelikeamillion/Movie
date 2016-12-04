@@ -3,7 +3,7 @@ package com.udacity.movie.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
+/**https://api.themoviedb.org/3/movie/popular?api_key=***
  * 电影属性
  * {
  *  "poster_path":"\/xfWac8MTYDxujaxgPVcRD9yZaul.jpg",
@@ -36,7 +36,7 @@ public class MovieInfo implements Parcelable{
     public String original_language;                                    // 语言
     public String title;                                                // 片名
     public String backdrop_path;
-    public float popularity;                                           // 受欢迎度
+    public float popularity;                                            // 受欢迎度
     public int vote_count;                                              // 评分数量
     public boolean video;
     public int vote_average;                                            // 平均得分
