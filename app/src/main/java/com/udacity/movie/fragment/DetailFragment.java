@@ -9,9 +9,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 import com.udacity.movie.R;
+import com.udacity.movie.api.FetchMovieByIdResponse;
 import com.udacity.movie.model.MovieInfo;
+import com.udacity.movie.net.FetchDetailTask;
 
 /**
  * 电影详情页
@@ -28,6 +31,7 @@ public class DetailFragment extends Fragment {
     private TextView mTvPopularity;
     private TextView mTvVoteCount;
     private TextView mTvOverView;
+    private TextView mTvRunTime;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,6 +44,7 @@ public class DetailFragment extends Fragment {
         mTvPopularity = (TextView) rootView.findViewById(R.id.tv_movie_popularity);
         mTvVoteCount = (TextView) rootView.findViewById(R.id.tv_movie_vote_count);
         mTvOverView = (TextView) rootView.findViewById(R.id.tv_overview);
+        mTvRunTime = (TextView) rootView.findViewById(R.id.tv_runtime);
 
         Intent intent = getActivity().getIntent();
         if (intent.hasExtra(Intent.EXTRA_RETURN_RESULT)) {
@@ -51,6 +56,16 @@ public class DetailFragment extends Fragment {
             mTvPopularity.setText(String.format(getResources().getString(R.string.popularity), mMovieInfo.popularity));
             mTvVoteCount.setText(String.format(getResources().getString(R.string.vote_count), mMovieInfo.vote_count));
             mTvOverView.setText(String.format(getResources().getString(R.string.overview), mMovieInfo.overview));
+
+            FetchDetailTask fetchDetailTask = new FetchDetailTask() {
+                @Override
+                public void onSuccess(String content, String task) {
+
+                    FetchMovieByIdResponse fetchMovieByIdResponse = new Gson().fromJson(content, FetchMovieByIdResponse.class);
+                    mTvRunTime.setText("Runtime: "+fetchMovieByIdResponse.runtime+"");
+                }
+            };
+            fetchDetailTask.execute(mMovieInfo.id+"");
         }
 
         return rootView;

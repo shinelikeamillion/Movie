@@ -63,29 +63,29 @@ package com.udacity.movie.api;
  */
 
 public class FetchMovieByIdResponse {
-    private int id;
-    private boolean adult;
-    private String backdrop_path;
-    private long budget;
-    private Genres[] genres;
-    private String homepage;
-    private String imdb_id;
-    private String original_language;
-    private String original_title;
-    private String overview;
-    private float popularity;
-    private String poster_path;
-    private ProductionCompanies[] production_companies;
-    private ProductionCountries[] production_countries;
-    private String release_date;
-    private long revenue;
-    private int runtime;
-    private String status;
-    private String tagline;
-    private String title;
-    private boolean video;
-    private float vote_average;
-    private int vote_count;
+    public int id;
+    public boolean adult;
+    public String backdrop_path;
+    public long budget;
+    public Genres[] genres;
+    public String homepage;
+    public String imdb_id;
+    public String original_language;
+    public String original_title;
+    public String overview;
+    public float popularity;
+    public String poster_path;
+    public ProductionCompanies[] production_companies;
+    public ProductionCountries[] production_countries;
+    public String release_date;
+    public long revenue;
+    public int runtime;
+    public String status;
+    public String tagline;
+    public String title;
+    public boolean video;
+    public float vote_average;
+    public int vote_count;
 
     private class Genres {
         private int id;
