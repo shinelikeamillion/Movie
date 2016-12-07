@@ -5,13 +5,8 @@ import android.util.Log;
 
 public abstract class FetchDetailTask extends AsyncTask<String, Void, String> {
 
-    String task;
-    public void FetchMovieTask (String task) {
-        this.task = task;
-    }
-
     public static final String TAG = FetchDetailTask.class.getSimpleName();
-    public abstract void onSuccess (String content, String task);
+    public abstract void onSuccess (String content);
 
     @Override
     protected String doInBackground(String... params) {
@@ -20,7 +15,7 @@ public abstract class FetchDetailTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String responseStr) {
-        Log.d(TAG+"RESPONSE: ", responseStr);
-        onSuccess(responseStr, task);
+        Log.e(TAG, responseStr);
+        onSuccess(responseStr);
     }
 }

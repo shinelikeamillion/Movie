@@ -14,71 +14,27 @@ package com.udacity.movie.api;
              "size": 1080,
              "type": "Trailer"
          },
-         {
-             "id": "57c86c589251416fc5000956",
-             "iso_639_1": "en",
-             "iso_3166_1": "US",
-             "key": "rbCYloWrR7A",
-             "name": "\"Open Your Mind\"",
-             "site": "YouTube",
-             "size": 1080,
-             "type": "Featurette"
-         },
-         {
-             "id": "57eb5a5ac3a36868bd002ec5",
-             "iso_639_1": "en",
-             "iso_3166_1": "US",
-             "key": "QNpNwIJtpIs",
-             "name": "Official Trailer 2",
-             "site": "YouTube",
-             "size": 720,
-             "type": "Trailer"
-         },
-         {
-             "id": "5817b6789251415abb01e44a",
-             "iso_639_1": "en",
-             "iso_3166_1": "US",
-             "key": "ZN2GdN9A-e4",
-             "name": "Doctor Strange (2016) Official Trailer 2",
-             "site": "YouTube",
-             "size": 720,
-             "type": "Trailer"
-         },
-         {
-             "id": "57f3881ac3a368334e008188",
-             "iso_639_1": "en",
-             "iso_3166_1": "US",
-             "key": "3xoxeCWpZyU",
-             "name": "TV Spot",
-             "site": "YouTube",
-             "size": 1080,
-             "type": "Trailer"
-         },
-         {
-             "id": "571b376cc3a368197c0022e2",
-             "iso_639_1": "en",
-             "iso_3166_1": "US",
-             "key": "Lt-U_t2pUHI",
-             "name": "Official Teaser Trailer",
-             "site": "YouTube",
-             "size": 1080,
-             "type": "Teaser"
-         }
+         ** same **
      ]
  }
  */
 
 public class FetchVideosResponse {
-    private int id;
-    private Results[] results;
+    public int id;
+    public Results[] results;
 
-    private class Results {
-        private int id;
+    public class Results {
+        private String id;
         private String iso_639_1;
         private String iso_3166_1;
-        private String key;
+        public String key;
         private String name;
         private String site;
+        private int size;
         private String type;
+
+        public boolean isYouTube(){
+            return this.site.equals("YouTube");
+        }
     }
 }

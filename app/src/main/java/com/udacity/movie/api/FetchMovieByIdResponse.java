@@ -87,22 +87,22 @@ public class FetchMovieByIdResponse {
     public float vote_average;
     public int vote_count;
 
-    private class Genres {
+    public class Genres {
         private int id;
         private String name;
     }
 
-    private class ProductionCompanies {
+    public class ProductionCompanies {
         private int id;
         private String name;
     }
 
-    private class ProductionCountries {
+    public class ProductionCountries {
         private String iso_3166_1;
         private String name;
     }
 
-    private class Spoken_languages {
+    public class Spoken_languages {
         private String iso_639_1;
         private String name;
     }

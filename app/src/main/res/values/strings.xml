@@ -21,4 +21,7 @@
     <string name="sync_account_type">movie.udacity.com</string>
     <string name="content_authority">com.udacity.movie.app</string>
 
+    <!-- youtube thumbnail -->
+    <string name="youtube_thumbnail">https://img.youtube.com/vi/%s/default.jpg</string>
+
 </resources>

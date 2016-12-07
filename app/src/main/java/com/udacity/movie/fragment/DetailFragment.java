@@ -7,12 +7,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 import com.udacity.movie.R;
+import com.udacity.movie.adapter.ReviewsAdapter;
+import com.udacity.movie.adapter.VideosAdapter;
 import com.udacity.movie.api.FetchMovieByIdResponse;
+import com.udacity.movie.api.FetchReviewResponse;
+import com.udacity.movie.api.FetchVideosResponse;
 import com.udacity.movie.model.MovieInfo;
 import com.udacity.movie.net.FetchDetailTask;
 
@@ -33,6 +38,9 @@ public class DetailFragment extends Fragment {
     private TextView mTvOverView;
     private TextView mTvRunTime;
 
+    private ListView mVideoList;
+    private ListView mReviewList;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -46,6 +54,9 @@ public class DetailFragment extends Fragment {
         mTvOverView = (TextView) rootView.findViewById(R.id.tv_overview);
         mTvRunTime = (TextView) rootView.findViewById(R.id.tv_runtime);
 
+        mVideoList = (ListView) rootView.findViewById(R.id.lv_videos);
+        mReviewList = (ListView) rootView.findViewById(R.id.lv_reviews);
+
         Intent intent = getActivity().getIntent();
         if (intent.hasExtra(Intent.EXTRA_RETURN_RESULT)) {
             mMovieInfo = intent.getParcelableExtra(Intent.EXTRA_RETURN_RESULT);
@@ -57,17 +68,50 @@ public class DetailFragment extends Fragment {
             mTvVoteCount.setText(String.format(getResources().getString(R.string.vote_count), mMovieInfo.vote_count));
             mTvOverView.setText(String.format(getResources().getString(R.string.overview), mMovieInfo.overview));
 
-            FetchDetailTask fetchDetailTask = new FetchDetailTask() {
-                @Override
-                public void onSuccess(String content, String task) {
+            String movieId = String.valueOf(mMovieInfo.id);
 
-                    FetchMovieByIdResponse fetchMovieByIdResponse = new Gson().fromJson(content, FetchMovieByIdResponse.class);
-                    mTvRunTime.setText("Runtime: "+fetchMovieByIdResponse.runtime+"");
-                }
-            };
-            fetchDetailTask.execute(mMovieInfo.id+"");
+            getRuntime(movieId);
+
+            getVideos(movieId+"/videos");
+
+            getReviews(movieId+"/reviews");
         }
 
         return rootView;
+    }
+
+    // FIXME: 12/8/16 : Why there is shown one view
+    private void getReviews(String key) {
+        new FetchDetailTask() {
+            @Override
+            public void onSuccess(String content) {
+                FetchReviewResponse fetchReviewResponse = new Gson().fromJson(content, FetchReviewResponse.class);
+                ReviewsAdapter reviewsAdapter = new ReviewsAdapter(getActivity(), fetchReviewResponse.results);
+                mReviewList.setAdapter(reviewsAdapter);
+            }
+        }.execute(key);
+    }
+
+    private void getVideos(String key) {
+        new FetchDetailTask() {
+
+            @Override
+            public void onSuccess(String content) {
+                FetchVideosResponse fetchVideosResponse = new Gson().fromJson(content, FetchVideosResponse.class);
+                VideosAdapter videosAdapter = new VideosAdapter(getActivity(), fetchVideosResponse.results);
+                mVideoList.setAdapter(videosAdapter);
+            }
+        }.execute(key);
+    }
+
+    private void getRuntime(String movieId) {
+        new FetchDetailTask() {
+            @Override
+            public void onSuccess(String content) {
+
+                FetchMovieByIdResponse fetchMovieByIdResponse = new Gson().fromJson(content, FetchMovieByIdResponse.class);
+                mTvRunTime.setText("Runtime: "+fetchMovieByIdResponse.runtime+"");
+            }
+        }.execute(movieId);
     }
 }

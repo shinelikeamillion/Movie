@@ -37,7 +37,6 @@ public class MoviesGridAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         Log.e(TAG, "newView");
 
-
         ImageView imageView = new ImageView(context);
         layoutParams = new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
