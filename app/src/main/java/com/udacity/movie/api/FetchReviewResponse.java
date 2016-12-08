@@ -26,7 +26,7 @@ public class FetchReviewResponse {
 
     public class Results {
         private String id;
-        private String author;
+        public String author;
         public String content;
         private String url;
     }

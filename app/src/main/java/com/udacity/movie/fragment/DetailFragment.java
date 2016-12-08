@@ -3,11 +3,12 @@ package com.udacity.movie.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -38,8 +39,8 @@ public class DetailFragment extends Fragment {
     private TextView mTvOverView;
     private TextView mTvRunTime;
 
-    private ListView mVideoList;
-    private ListView mReviewList;
+    private RecyclerView mVideoList;
+    private RecyclerView mReviewList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -54,8 +55,13 @@ public class DetailFragment extends Fragment {
         mTvOverView = (TextView) rootView.findViewById(R.id.tv_overview);
         mTvRunTime = (TextView) rootView.findViewById(R.id.tv_runtime);
 
-        mVideoList = (ListView) rootView.findViewById(R.id.lv_videos);
-        mReviewList = (ListView) rootView.findViewById(R.id.lv_reviews);
+        mVideoList = (RecyclerView) rootView.findViewById(R.id.rv_videos);
+        mVideoList.setHasFixedSize(true);
+        mVideoList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+
+        mReviewList = (RecyclerView) rootView.findViewById(R.id.rv_reviews);
+        mReviewList.setHasFixedSize(true);
+        mReviewList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
 
         Intent intent = getActivity().getIntent();
         if (intent.hasExtra(Intent.EXTRA_RETURN_RESULT)) {
