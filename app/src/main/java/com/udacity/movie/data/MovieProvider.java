@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.udacity.movie.MyApplication;
@@ -25,7 +26,8 @@ public class MovieProvider extends ContentProvider {
     static final int MOVIE_ID = 102;
     static final int MOVIES_FAVORED = 103;
 
-    private static final String sMovieFavoredSelection = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID + " IN ?";
+    private static final String sMovieFavoredSelection = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID
+            + " IN ";
     // movie.movie_id = ?
     private static final String sMovieIdSelection = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID + " = ?";
 
@@ -38,6 +40,11 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(authority, MovieContract.PATH_MOVIE + "/movies_favored", MOVIES_FAVORED);
 
         return matcher;
+    }
+
+    private static String getMoviesId () {
+        String[] aa = MyApplication.favoredMovieId.toArray(new String[MyApplication.favoredMovieId.size()]);
+        return "("+TextUtils.join(",", aa)+")";
     }
 
     @Override
@@ -65,13 +72,11 @@ public class MovieProvider extends ContentProvider {
                 break;
             }
             case MOVIES_FAVORED: {
-                String [] arr = new String[MyApplication.favoredMovieId.size()];
-                arr = (String[]) MyApplication.favoredMovieId.toArray(arr);
                 retCursor = db.query(
                         MovieEntry.TABLE_NAME,
                         projection,
-                        sMovieFavoredSelection,
-                        arr,
+                        sMovieFavoredSelection + getMoviesId(),
+                        selectionArgs,
                         null,
                         null,
                         sortOrder

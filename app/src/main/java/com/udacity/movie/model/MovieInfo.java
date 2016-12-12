@@ -1,10 +1,20 @@
 package com.udacity.movie.model;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.udacity.movie.MyApplication;
 import com.udacity.movie.data.MovieContract.MovieEntry;
+
+import static com.udacity.movie.data.MovieContract.MovieEntry.COL_MOVIE_ID;
+import static com.udacity.movie.data.MovieContract.MovieEntry.COL_MOVIE_ORIGINAL_TITLE;
+import static com.udacity.movie.data.MovieContract.MovieEntry.COL_MOVIE_OVERVIEW;
+import static com.udacity.movie.data.MovieContract.MovieEntry.COL_MOVIE_POPUlARITY;
+import static com.udacity.movie.data.MovieContract.MovieEntry.COL_MOVIE_POSTER_PATH;
+import static com.udacity.movie.data.MovieContract.MovieEntry.COL_MOVIE_RELEASE_DATE;
+import static com.udacity.movie.data.MovieContract.MovieEntry.COL_MOVIE_VOTE_AVERAGE;
 
 /**https://api.themoviedb.org/3/movie/popular?api_key=***
  * 电影属性
@@ -168,5 +178,24 @@ public class MovieInfo implements Parcelable{
         movieValues.put(MovieEntry.COLUMN_FAVORED, favored);
 
         return movieValues;
+    }
+
+    public static MovieInfo getMovieInfo (Cursor cursor) {
+        return new MovieInfo(
+                cursor.getString(COL_MOVIE_POSTER_PATH),
+                "",
+                cursor.getString(COL_MOVIE_OVERVIEW),
+                cursor.getString(COL_MOVIE_RELEASE_DATE),
+                null,
+                cursor.getInt(COL_MOVIE_ID),
+                cursor.getString(COL_MOVIE_ORIGINAL_TITLE),
+                "",
+                cursor.getString(COL_MOVIE_ORIGINAL_TITLE),
+                "",
+                cursor.getFloat(COL_MOVIE_POPUlARITY),
+                0,
+                false,
+                cursor.getInt(COL_MOVIE_VOTE_AVERAGE),
+                MyApplication.favoredMovieId.contains(cursor.getInt(COL_MOVIE_ID)+"")  ? 1 : 0);
     }
 }

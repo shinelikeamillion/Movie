@@ -78,12 +78,13 @@ public class DetailFragment extends Fragment {
 
                 // TODO: 12/12/16 时间紧张,先存到sharepreference 里面吧
                 if (MyApplication.favoredMovieId.contains(mMovieInfo.id+"")) {
-                    Utility.getFavoredMoviesPreference(getActivity()).remove(mMovieInfo.id+"");
+                    MyApplication.favoredMovieId.remove(mMovieInfo.id+"");
                     mMovieInfo.favored = 0;
                 } else {
-                    Utility.putFavoredMoviesPreference(getActivity(), mMovieInfo.id+"");
+                    MyApplication.favoredMovieId.add(mMovieInfo.id+"");
                     mMovieInfo.favored = 1;
                 }
+                Utility.putFavoredMoviesPreference(getActivity(), MyApplication.favoredMovieId);
                 updateFavoredView();
             }
         });
@@ -113,7 +114,6 @@ public class DetailFragment extends Fragment {
 
         return rootView;
     }
-
 
     private void updateFavoredView () {
         if (mMovieInfo.favored == 1) {

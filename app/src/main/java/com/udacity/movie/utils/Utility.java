@@ -3,10 +3,8 @@ package com.udacity.movie.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build.VERSION_CODES;
-import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 
-import com.udacity.movie.MyApplication;
 import com.udacity.movie.data.MovieContract;
 import com.udacity.movie.data.MovieContract.MovieEntry;
 
@@ -28,24 +26,21 @@ public class Utility {
         getDefaultSharedPreferences(context)
                 .edit()
                 .putString(SORT_ORDER, sortOrder)
-                .apply();
+                .commit();
     }
 
     @RequiresApi(api = VERSION_CODES.HONEYCOMB)
     public static HashSet<String> getFavoredMoviesPreference (Context context) {
-        return (HashSet<String>) PreferenceManager
-                .getDefaultSharedPreferences(context)
-                .getStringSet(FAVORED_MOVIES, new HashSet<String>());
+        return new HashSet<>(getDefaultSharedPreferences(context)
+                .getStringSet(FAVORED_MOVIES, new HashSet<String>()));
     }
 
     @RequiresApi(api = VERSION_CODES.HONEYCOMB)
-    public static void putFavoredMoviesPreference (Context context, String movieId) {
-        MyApplication.favoredMovieId.add(movieId);
-        PreferenceManager
-                .getDefaultSharedPreferences(context)
+    public static void putFavoredMoviesPreference (Context context, HashSet<String> favoredMoviesId) {
+        getDefaultSharedPreferences(context)
                 .edit()
-                .putStringSet(FAVORED_MOVIES, MyApplication.favoredMovieId)
-                .apply();
+                .putStringSet(FAVORED_MOVIES, favoredMoviesId)
+                .commit();
     }
 
     public static String getOrderUrlKey (Context context) {

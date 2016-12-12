@@ -1,7 +1,6 @@
 package com.udacity.movie.net;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 public abstract class FetchDetailTask extends AsyncTask<String, Void, String> {
 
@@ -15,7 +14,6 @@ public abstract class FetchDetailTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String responseStr) {
-        Log.e(TAG, responseStr);
         if (null != responseStr) {
             onSuccess(responseStr);
         }

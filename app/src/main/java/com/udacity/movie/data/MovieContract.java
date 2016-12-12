@@ -26,6 +26,16 @@ public class MovieContract {
     public static final class MovieEntry implements BaseColumns {
         public static final String TABLE_NAME = "movie";
 
+        public static final int COL_MOVIE_ID = 1;
+        public static final int COL_MOVIE_ORIGINAL_TITLE = 2;
+        public static final int COL_MOVIE_RELEASE_DATE = 3;
+        public static final int COL_MOVIE_POSTER_PATH = 4;
+        public static final int COL_MOVIE_VOTE_AVERAGE = 5;
+        public static final int COL_MOVIE_POPUlARITY = 6;
+        public static final int COL_MOVIE_LENGTH = 7;
+        public static final int COL_MOVIE_OVERVIEW = 8;
+        public static final int COL_MOVIE_FAVORED = 9;
+
         public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_ORIGINAL_TITLE = "movie_original_title"; // 片名
         public static final String COLUMN_RELEASE_DATE = "movie_release_date"; // 上映日期

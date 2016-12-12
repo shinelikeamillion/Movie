@@ -46,22 +46,10 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
     private int mPosition = GridView.INVALID_POSITION;
     private Uri uri;
 
-    static final int COL_MOVIE_ID = 0+1;
-    static final int COL_MOVIE_ORIGINAL_TITLE = 1+1;
-    static final int COL_MOVIE_RELEASE_DATE = 2+1;
-    static final int COL_MOVIE_POSTER_PATH = 3+1;
-    static final int COL_MOVIE_VOTE_AVERAGE = 4+1;
-    static final int COL_MOVIE_POPUlARITY = 5+1;
-    static final int COL_MOVIE_LENGTH = 6+1;
-    static final int COL_MOVIE_OVERVIEW = 7+1;
-    static final int COL_MOVIE_FAVORE = 8+1;
-
     private GridView gridView;
     private View rootView;
 
     private MoviesGridAdapter moviesAdapter;
-
-    private String sortOrder;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,7 +63,7 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
         super.onResume();
 
         MyApplication.favoredMovieId = Utility.getFavoredMoviesPreference(getActivity());
-        Log.e(TAG, MyApplication.favoredMovieId.size()+"");
+        getLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
     }
 
     @Override
@@ -96,23 +84,7 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
                 MovieInfo movieInfo = null;
                 if (cursor != null) {
-                    movieInfo = new MovieInfo(
-                            cursor.getString(COL_MOVIE_POSTER_PATH),
-                            "",
-                            cursor.getString(COL_MOVIE_OVERVIEW),
-                            cursor.getString(COL_MOVIE_RELEASE_DATE),
-                            null,
-                            cursor.getInt(COL_MOVIE_ID),
-                            cursor.getString(COL_MOVIE_ORIGINAL_TITLE),
-                            "",
-                            cursor.getString(COL_MOVIE_ORIGINAL_TITLE),
-                            "",
-                            cursor.getFloat(COL_MOVIE_POPUlARITY),
-                            0,
-                            false,
-                            cursor.getInt(COL_MOVIE_VOTE_AVERAGE),
-                            MyApplication.favoredMovieId.contains(cursor.getInt(COL_MOVIE_ID)+"")  ? 1 : 0
-                    );
+                    movieInfo = MovieInfo.getMovieInfo(cursor);
                 }
                 intent.putExtra(Intent.EXTRA_RETURN_RESULT, movieInfo);
                 startActivity(intent);
