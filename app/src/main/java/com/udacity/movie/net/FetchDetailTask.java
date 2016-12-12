@@ -16,6 +16,8 @@ public abstract class FetchDetailTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String responseStr) {
         Log.e(TAG, responseStr);
-        onSuccess(responseStr);
+        if (null != responseStr) {
+            onSuccess(responseStr);
+        }
     }
 }

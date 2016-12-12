@@ -1,7 +1,10 @@
 package com.udacity.movie.model;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.udacity.movie.data.MovieContract.MovieEntry;
 
 /**https://api.themoviedb.org/3/movie/popular?api_key=***
  * 电影属性
@@ -40,6 +43,7 @@ public class MovieInfo implements Parcelable{
     public int vote_count;                                              // 评分数量
     public boolean video;
     public int vote_average;                                            // 平均得分
+    public int favored;                                                 // 是否收藏
 
     public MovieInfo (String poster_path,
                       String adult,
@@ -54,7 +58,8 @@ public class MovieInfo implements Parcelable{
                       float popularity,
                       int vote_count,
                       boolean video,
-                      int vote_average) {
+                      int vote_average,
+                      int favored) {
 
         this.poster_path = BASE_URL.concat(poster_path);
         this.adult = adult;
@@ -70,6 +75,7 @@ public class MovieInfo implements Parcelable{
         this.vote_count = vote_count;
         this.video = video;
         this.vote_average = vote_average;
+        this.favored = favored;
     }
 
     protected MovieInfo(Parcel in) {
@@ -87,6 +93,7 @@ public class MovieInfo implements Parcelable{
         vote_count = in.readInt();
         video = in.readByte() != 0;
         vote_average = in.readInt();
+        favored = in.readInt();
     }
 
     public static final Creator<MovieInfo> CREATOR = new Creator<MovieInfo>() {
@@ -100,6 +107,8 @@ public class MovieInfo implements Parcelable{
             return new MovieInfo[size];
         }
     };
+
+
 
     @Override
     public String toString() {
@@ -118,6 +127,7 @@ public class MovieInfo implements Parcelable{
                 "vote_count = " + vote_count + "\n" +
                 "video = " + video + "\n" +
                 "vote_average = " + vote_average + "\n" +
+                "favored = " + favored + "\n" +
                 " }";
     }
 
@@ -142,5 +152,21 @@ public class MovieInfo implements Parcelable{
         dest.writeInt(vote_count);
         dest.writeByte((byte) (video ? 1 : 0));
         dest.writeInt(vote_average);
+        dest.writeInt(favored);
+    }
+
+    public ContentValues toContentValues () {
+        ContentValues movieValues = new ContentValues();
+        movieValues.put(MovieEntry.COLUMN_MOVIE_ID, id);
+        movieValues.put(MovieEntry.COLUMN_ORIGINAL_TITLE, title);
+        movieValues.put(MovieEntry.COLUMN_RELEASE_DATE, release_date);
+        movieValues.put(MovieEntry.COLUMN_POSTER_PATH, poster_path);
+        movieValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, vote_average);
+        movieValues.put(MovieEntry.COLUMN_POPUlARITY, popularity);
+        movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
+        movieValues.put(MovieEntry.COLUMN_LENGTH, "");
+        movieValues.put(MovieEntry.COLUMN_FAVORED, favored);
+
+        return movieValues;
     }
 }

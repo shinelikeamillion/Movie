@@ -30,8 +30,7 @@
                 android:layout_width="@dimen/detail_poster_width"
                 android:layout_height="@dimen/detail_poster_height"
                 android:layout_margin="@dimen/normal_spacing"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/ic_launcher"/>
+                android:scaleType="centerCrop"/>
 
             <TextView
                 android:id="@+id/tv_movie_release_date"
@@ -43,7 +42,8 @@
                 android:id="@+id/tv_movie_vote_count"
                 style="@style/TextViewBody2Style"
                 android:layout_toRightOf="@id/iv_movie_poster"
-                android:layout_below="@id/tv_movie_release_date" />
+                android:layout_below="@id/tv_movie_release_date"
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/tv_movie_popularity"
@@ -56,6 +56,13 @@
                 style="@style/TextViewBody2Style"
                 android:layout_toRightOf="@id/iv_movie_poster"
                 android:layout_below="@id/tv_movie_popularity"/>
+
+            <TextView
+                android:id="@+id/btn_favorite"
+                style="@style/TextViewBody2Style"
+                android:text="MARK AS FAVORITE"
+                android:layout_toRightOf="@id/iv_movie_poster"
+                android:layout_below="@id/tv_runtime"/>
 
         </RelativeLayout>
 
@@ -80,8 +87,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_videos"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:scrollbars="horizontal"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <LinearLayout

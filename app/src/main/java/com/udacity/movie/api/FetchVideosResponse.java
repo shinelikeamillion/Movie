@@ -24,6 +24,7 @@ public class FetchVideosResponse {
     public Results[] results;
 
     public class Results {
+        public static final String BASE_YOUTUBE_URL = "http://www.youtube.com/watch?v=";
         private String id;
         private String iso_639_1;
         private String iso_3166_1;

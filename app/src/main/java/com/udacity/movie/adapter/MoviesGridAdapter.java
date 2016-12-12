@@ -42,9 +42,9 @@ public class MoviesGridAdapter extends CursorAdapter {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 (int) context.getResources().getDimension(R.dimen.poster_height));
         imageView.setLayoutParams(layoutParams);
+        ViewHolder viewHolder = new ViewHolder(imageView);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
-        ViewHolder viewHolder = new ViewHolder(imageView);
         imageView.setTag(viewHolder);
 
         return imageView;

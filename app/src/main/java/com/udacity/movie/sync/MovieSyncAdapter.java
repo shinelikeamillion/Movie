@@ -2,14 +2,19 @@ package com.udacity.movie.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.annotation.TargetApi;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.net.Uri;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import com.udacity.movie.BuildConfig;
@@ -33,12 +38,24 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import static com.udacity.movie.data.MovieContract.BASE_SERVER_URL;
+
 public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String TAG = MovieSyncAdapter.class.getSimpleName();
 
+    public static final int SYNC_INTERVAL = 5 * 60 * 60;
+    public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 5;
+
+    private static final long DAY_IN_MILLIS = 24 * 60 * 60 * 1000;
+
     public MovieSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
+    }
+
+    @TargetApi(VERSION_CODES.HONEYCOMB)
+    public MovieSyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
+        super(context, autoInitialize, allowParallelSyncs);
     }
 
     @Override
@@ -71,6 +88,19 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private static void onAccountCreated(Account mAccount, Context context){
+
+        MovieSyncAdapter.configurePeriodicSync(
+                context,
+                SYNC_INTERVAL,
+                SYNC_FLEXTIME
+        );
+
+        ContentResolver.setSyncAutomatically(
+                mAccount,
+                context.getString(R.string.content_authority),
+                true
+        );
+
         syncImmediately(context);
     }
 
@@ -79,8 +109,28 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         getSyncAccount(context);
     }
 
+    public static void configurePeriodicSync (Context context, int syncInterval, int flexTime) {
+        Account account = getSyncAccount(context);
+        String authority = context.getString(R.string.content_authority);
+        if (VERSION.SDK_INT >= VERSION_CODES.KITKAT) {
+            SyncRequest request = new SyncRequest.Builder()
+                    .syncPeriodic(syncInterval, flexTime)
+                    .setSyncAdapter(account, authority)
+                    .setExtras(new Bundle())
+                    .build();
+            ContentResolver.requestSync(request);
+        } else {
+            ContentResolver.addPeriodicSync(
+                    account,
+                    authority,
+                    new Bundle(),
+                    syncInterval
+            );
+        }
+    }
+
     private MovieResults getMovies(String choice) {
-        final String MVDB_BASE_URL = "https://api.themoviedb.org/3/movie/"+choice+"?";
+        final String MVDB_BASE_URL = BASE_SERVER_URL+choice+"?";
         final String APPID_PARAM = "api_key";
 
         Uri buildUri = Uri.parse(MVDB_BASE_URL)
@@ -158,6 +208,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     // 从jSON字符中解析出我们需要的数据
+    @RequiresApi(api = VERSION_CODES.HONEYCOMB)
     private MovieResults getMoviesFromJSONStr (String moviesJSONStr) throws JSONException {
         // 提取所需要的JSON对象的键名
         final String MR_PAGE = "page";
@@ -214,7 +265,8 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                     Float.parseFloat(movieJson.getString(M_POPULARITY)),
                     movieJson.getInt(M_VOTE_COUNT),
                     movieJson.getBoolean(M_VIDEO),
-                    movieJson.getInt(M_VOTE_AVERAGE));
+                    movieJson.getInt(M_VOTE_AVERAGE),
+                    0);
 
             ContentValues movieValues = new ContentValues();
             movieValues.put(MovieEntry.COLUMN_MOVIE_ID, movie.id);
@@ -225,8 +277,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
             movieValues.put(MovieEntry.COLUMN_POPUlARITY, movie.popularity);
             movieValues.put(MovieEntry.COLUMN_LENGTH, "");
             movieValues.put(MovieEntry.COLUMN_OVERVIEW, movie.overview);
-            movieValues.put(MovieEntry.COLUMN_FAVORED, 0);
-            Log.d(TAG, movie.original_title);
+            movieValues.put(MovieEntry.COLUMN_FAVORED, movie.favored);
             cVVector.add(movieValues);
 
             moviesResult.results.add(movie);

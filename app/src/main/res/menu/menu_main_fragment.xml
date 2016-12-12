@@ -10,4 +10,7 @@
     <item android:title="Top Rated"
         android:id="@+id/action_top_rated"
         app:showAsAction="never" />
+    <item android:title="Favored"
+          android:id="@+id/action_favored"
+          app:showAsAction="never"/>
 </menu>

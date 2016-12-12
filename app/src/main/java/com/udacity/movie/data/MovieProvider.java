@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.udacity.movie.MyApplication;
 import com.udacity.movie.data.MovieContract.MovieEntry;
 
 public class MovieProvider extends ContentProvider {
@@ -24,9 +25,7 @@ public class MovieProvider extends ContentProvider {
     static final int MOVIE_ID = 102;
     static final int MOVIES_FAVORED = 103;
 
-    // movie.favored == 1
-    private static final String sFavoredSelection = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_FAVORED + " = 1";
-
+    private static final String sMovieFavoredSelection = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID + " IN ?";
     // movie.movie_id = ?
     private static final String sMovieIdSelection = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID + " = ?";
 
@@ -66,11 +65,13 @@ public class MovieProvider extends ContentProvider {
                 break;
             }
             case MOVIES_FAVORED: {
+                String [] arr = new String[MyApplication.favoredMovieId.size()];
+                arr = (String[]) MyApplication.favoredMovieId.toArray(arr);
                 retCursor = db.query(
                         MovieEntry.TABLE_NAME,
                         projection,
-                        sFavoredSelection,
-                        selectionArgs,
+                        sMovieFavoredSelection,
+                        arr,
                         null,
                         null,
                         sortOrder
@@ -179,7 +180,7 @@ public class MovieProvider extends ContentProvider {
 
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-
+        Log.e("update", uri.toString()+"\n"+values.toString());
         final int match = sUriMather.match(uri);
         int rowsUpdated;
 
@@ -193,17 +194,18 @@ public class MovieProvider extends ContentProvider {
                         selectionArgs
                 );
                 break;
-//                Integer movieId = MovieEntry.getMovieIdFromUri(uri);
-//                Integer favored = MovieEntry.getFavoredFromUri(uri);
-//                values = new ContentValues();
-//                values.put(MovieEntry.COLUMN_FAVORED, favored);
-//                rowsUpdated = db.update(
-//                        MovieEntry.TABLE_NAME,
-//                        values,
-//                        sMovieIdSelection,
-//                        new String[] {Integer.toString(movieId)}
-//                );
-//                break;
+            case MOVIES_FAVORED:
+                Integer movieId = MovieEntry.getMovieIdFromUri(uri);
+                Integer favored = MovieEntry.getFavoredFromUri(uri);
+                values = new ContentValues();
+                values.put(MovieEntry.COLUMN_FAVORED, favored);
+                rowsUpdated = db.update(
+                        MovieEntry.TABLE_NAME,
+                        values,
+                        sMovieIdSelection,
+                        new String[] {Integer.toString(movieId)}
+                );
+                break;
             default:
                 throw new UnsupportedOperationException("Uri 错误: "+uri);
         }

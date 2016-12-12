@@ -178,7 +178,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, MovieResults> {
                     Float.parseFloat(movieJson.getString(M_POPULARITY)),
                     movieJson.getInt(M_VOTE_COUNT),
                     movieJson.getBoolean(M_VIDEO),
-                    movieJson.getInt(M_VOTE_AVERAGE));
+                    movieJson.getInt(M_VOTE_AVERAGE),
+                    0);
 
             ContentValues movieValues = new ContentValues();
             movieValues.put(MovieEntry.COLUMN_MOVIE_ID, movie.id);
