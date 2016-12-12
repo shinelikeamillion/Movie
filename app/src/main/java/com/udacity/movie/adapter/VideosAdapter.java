@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.movie.R;
@@ -49,7 +48,6 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
             holder.rootView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(context, "cliked", Toast.LENGTH_SHORT).show();
                     context.startActivity(
                             new Intent(Intent.ACTION_VIEW, Uri.parse(result.BASE_YOUTUBE_URL+result.key))
                     );
