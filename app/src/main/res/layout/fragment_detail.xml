@@ -14,12 +14,12 @@
             android:id="@+id/tv_movie_title"
             android:layout_width="match_parent"
             android:layout_height="@dimen/detail_title_height"
-            android:text="Title"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textSize="@dimen/title_size"
             android:textAllCaps="true"
             android:gravity="center_vertical"
-            android:paddingLeft="@dimen/normal_spacing"/>
+            android:paddingLeft="@dimen/normal_spacing"
+            tools:text="Title"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -60,7 +60,7 @@
             <TextView
                 android:id="@+id/btn_favorite"
                 style="@style/TextViewBody2Style"
-                android:text="MARK AS FAVORITE"
+                android:text="@string/mark_as_favored"
                 android:layout_toRightOf="@id/iv_movie_poster"
                 android:layout_below="@id/tv_runtime"/>
 
@@ -82,7 +82,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="Videos"/>
+                android:text="@string/videos"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_videos"
@@ -99,7 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="Reviews"/>
+                android:text="@string/reviews"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_reviews"

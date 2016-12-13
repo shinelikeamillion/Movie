@@ -26,10 +26,15 @@ public class MovieProvider extends ContentProvider {
     static final int MOVIE_ID = 102;
     static final int MOVIES_FAVORED = 103;
 
+    // movie.type
+    private static final String sMovieFetchTypeSelection = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_TYPE
+            + " = ?";
+    // movie.favored
     private static final String sMovieFavoredSelection = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID
             + " IN ";
     // movie.movie_id = ?
-    private static final String sMovieIdSelection = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID + " = ?";
+    private static final String sMovieIdSelection = MovieEntry.TABLE_NAME + "." + MovieEntry.COLUMN_MOVIE_ID
+            + " = ?";
 
     static UriMatcher buildUriMather () {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -63,7 +68,7 @@ public class MovieProvider extends ContentProvider {
                 retCursor = db.query(
                         MovieEntry.TABLE_NAME,
                         projection,
-                        selection,
+                        sMovieFetchTypeSelection,
                         selectionArgs,
                         null,
                         null,

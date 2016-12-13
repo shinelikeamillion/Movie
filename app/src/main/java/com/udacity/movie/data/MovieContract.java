@@ -45,6 +45,7 @@ public class MovieContract {
         public static final String COLUMN_LENGTH = "movie_length"; // 片长
         public static final String COLUMN_OVERVIEW = "movie_overview"; // 剧情简介
         public static final String COLUMN_FAVORED = "movie_favored"; // 是否收藏
+        public static final String COLUMN_TYPE = "movie_fetch_type"; // 拉取数据时的类型
 
         public static final Uri CONTENT_URI =  BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();
 

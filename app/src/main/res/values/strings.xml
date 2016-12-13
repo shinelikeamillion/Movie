@@ -24,4 +24,10 @@
     <!-- youtube thumbnail -->
     <string name="youtube_thumbnail">https://img.youtube.com/vi/%s/default.jpg</string>
 
+    <!-- detail -->
+    <string name="videos">Video</string>
+    <string name="reviews">Reviews</string>
+    <string name="mark_as_favored">MARK AS FAVORED</string>
+    <string name="favored">FAVORED</string>
+
 </resources>

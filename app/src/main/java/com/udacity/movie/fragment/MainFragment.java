@@ -3,7 +3,6 @@ package com.udacity.movie.fragment;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -22,7 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ListView;
 
 import com.udacity.movie.MyApplication;
 import com.udacity.movie.R;
@@ -44,7 +42,6 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
     // 记住滚动位置
     private static final String SELECTED_KEY = "selected_position";
     private int mPosition = GridView.INVALID_POSITION;
-    private Uri uri;
 
     private GridView gridView;
     private View rootView;
@@ -107,14 +104,13 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        uri = MovieEntry.CONTENT_URI;
         getLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (mPosition != ListView.INVALID_POSITION) {
+        if (mPosition != GridView.INVALID_POSITION) {
             outState.putInt(SELECTED_KEY, mPosition);
         }
         super.onSaveInstanceState(outState);
@@ -128,19 +124,21 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        mPosition = GridView.SCROLLBAR_POSITION_DEFAULT;
         switch (item.getItemId()) {
             case R.id.action_most_popular:
-                uri = MovieEntry.CONTENT_URI;
+                MyApplication.uri = MovieEntry.CONTENT_URI;
                 Utility.putSortOrderPreference(getActivity(), MovieEntry.COLUMN_POPUlARITY);
                 onSortOrderChanged();
                 break;
             case R.id.action_top_rated:
-                uri = MovieEntry.CONTENT_URI;
+                MyApplication.uri = MovieEntry.CONTENT_URI;
                 Utility.putSortOrderPreference(getActivity(), MovieEntry.COLUMN_VOTE_AVERAGE);
                 onSortOrderChanged();
                 break;
             case R.id.action_favored:
-                uri = MovieEntry.buildMovieFavored();
+                MyApplication.uri = MovieEntry.buildMovieFavored();
+                Utility.removeSortOrderPreference(getActivity());
                 getLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
                 break;
 
@@ -159,21 +157,23 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.e(TAG, "onCreateLoader");
+        String sortOrder = Utility.getPreferredSortOrder(getActivity());
+        String orderKey = Utility.getOrderUrlKey(getActivity());
+        String[] selection = null != orderKey ? new String[] {orderKey} : null;
         return new CursorLoader(
                 getActivity(),
-                uri,
+                MyApplication.uri,
                 null,
                 null,
-                null,
-                Utility.getPreferredSortOrder(getActivity()) + " DESC"
+                selection,
+                null != sortOrder? sortOrder + " DESC" : null
         );
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         moviesAdapter.swapCursor(data);
-        if (mPosition != ListView.INVALID_POSITION) {
+        if (mPosition != GridView.INVALID_POSITION) {
             gridView.smoothScrollToPosition(mPosition);
         }
     }

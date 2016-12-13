@@ -198,7 +198,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         }
 
         try {
-            return getMoviesFromJSONStr(moviesJSONStr);
+            return getMoviesFromJSONStr(moviesJSONStr, choice);
         } catch (JSONException e) {
             Log.e(TAG, "JSON 解析出错"+e.getMessage(), e);
         }
@@ -209,7 +209,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
 
     // 从jSON字符中解析出我们需要的数据
     @RequiresApi(api = VERSION_CODES.HONEYCOMB)
-    private MovieResults getMoviesFromJSONStr (String moviesJSONStr) throws JSONException {
+    private MovieResults getMoviesFromJSONStr (String moviesJSONStr, String choice) throws JSONException {
         // 提取所需要的JSON对象的键名
         final String MR_PAGE = "page";
         final String MR_TOTAL_PAGES = "total_pages";
@@ -278,6 +278,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
             movieValues.put(MovieEntry.COLUMN_LENGTH, "");
             movieValues.put(MovieEntry.COLUMN_OVERVIEW, movie.overview);
             movieValues.put(MovieEntry.COLUMN_FAVORED, movie.favored);
+            movieValues.put(MovieEntry.COLUMN_TYPE, choice);
             cVVector.add(movieValues);
 
             moviesResult.results.add(movie);
