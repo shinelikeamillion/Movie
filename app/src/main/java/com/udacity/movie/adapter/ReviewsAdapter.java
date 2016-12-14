@@ -33,14 +33,14 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Results result = results[position];
-        holder.review.setText(result.content);
-        holder.author.setText(result.author);
+        holder.review.setText(String.format(context.getResources().getString(R.string.review_author), result.content));
+        holder.author.setText(String.format(context.getResources().getString(R.string.review_author), result.author));
 
         holder.rootView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 new AlertDialog.Builder(context)
-                        .setMessage(result.content)
+                        .setMessage(String.format(context.getResources().getString(R.string.review_author), result.content))
                         .create().show();
             }
         });

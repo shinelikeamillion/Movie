@@ -1,24 +1,24 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.udacity.movie.fragment.DetailFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context="com.udacity.movie.fragment.DetailFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/tv_movie_title"
             android:layout_width="match_parent"
             android:layout_height="@dimen/detail_title_height"
+            android:gravity="center_vertical"
+            android:paddingLeft="@dimen/padding_ten"
+            android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textSize="@dimen/title_size"
-            android:textAllCaps="true"
-            android:gravity="center_vertical"
-            android:paddingLeft="@dimen/normal_spacing"
             tools:text="Title"/>
 
         <RelativeLayout
@@ -29,40 +29,38 @@
                 android:id="@+id/iv_movie_poster"
                 android:layout_width="@dimen/detail_poster_width"
                 android:layout_height="@dimen/detail_poster_height"
-                android:layout_margin="@dimen/normal_spacing"
-                android:scaleType="centerCrop"/>
+                android:layout_margin="@dimen/padding_ten"
+                android:scaleType="centerCrop"
+                tools:src="@mipmap/ic_launcher"/>
 
             <TextView
                 android:id="@+id/tv_movie_release_date"
                 style="@style/TextViewBody2Style"
+                android:layout_alignParentTop="true"
                 android:layout_toRightOf="@id/iv_movie_poster"
-                android:layout_alignParentTop="true" />
-
-            <TextView
-                android:id="@+id/tv_movie_vote_count"
-                style="@style/TextViewBody2Style"
-                android:layout_toRightOf="@id/iv_movie_poster"
-                android:layout_below="@id/tv_movie_release_date"
-                android:visibility="gone"/>
+                tools:text="2011/11/9"/>
 
             <TextView
                 android:id="@+id/tv_movie_popularity"
                 style="@style/TextViewBody2Style"
+                android:layout_below="@id/tv_movie_release_date"
                 android:layout_toRightOf="@id/iv_movie_poster"
-                android:layout_below="@id/tv_movie_vote_count" />
+                tools:text="44.32"/>
 
             <TextView
                 android:id="@+id/tv_runtime"
                 style="@style/TextViewBody2Style"
+                android:layout_below="@id/tv_movie_popularity"
                 android:layout_toRightOf="@id/iv_movie_poster"
-                android:layout_below="@id/tv_movie_popularity"/>
+                tools:text="120"/>
 
             <TextView
                 android:id="@+id/btn_favorite"
                 style="@style/TextViewBody2Style"
-                android:text="@string/mark_as_favored"
+                android:layout_below="@id/tv_runtime"
                 android:layout_toRightOf="@id/iv_movie_poster"
-                android:layout_below="@id/tv_runtime"/>
+                android:text="@string/mark_as_favored"
+                tools:text="Favored"/>
 
         </RelativeLayout>
 
@@ -70,8 +68,8 @@
             android:id="@+id/tv_overview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/normal_spacing"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            android:padding="@dimen/padding_ten"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -81,7 +79,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
+                android:padding="@dimen/padding_ten"
                 android:text="@string/videos"/>
 
             <android.support.v7.widget.RecyclerView
@@ -98,7 +96,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
+                android:padding="@dimen/padding_ten"
                 android:text="@string/reviews"/>
 
             <android.support.v7.widget.RecyclerView

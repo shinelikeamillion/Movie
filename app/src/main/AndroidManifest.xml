@@ -38,7 +38,11 @@
         <activity
             android:name="com.udacity.movie.activity.DetailActivity"
             android:label="@string/title_activity_detail"
-            android:parentActivityName="com.udacity.movie.activity.MainActivity"/>
+            android:parentActivityName="com.udacity.movie.activity.MainActivity">
+
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity"/>
+        </activity>
 
 
         <!-- 注意这里的参数 -->

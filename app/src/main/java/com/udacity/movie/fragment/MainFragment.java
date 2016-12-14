@@ -1,13 +1,11 @@
 package com.udacity.movie.fragment;
 
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
@@ -24,7 +22,6 @@ import android.widget.GridView;
 
 import com.udacity.movie.MyApplication;
 import com.udacity.movie.R;
-import com.udacity.movie.activity.DetailActivity;
 import com.udacity.movie.adapter.MoviesGridAdapter;
 import com.udacity.movie.data.MovieContract.MovieEntry;
 import com.udacity.movie.model.MovieInfo;
@@ -47,6 +44,10 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
     private View rootView;
 
     private MoviesGridAdapter moviesAdapter;
+
+    public interface MovieItemClickCallback {
+        void onItemSelected(MovieInfo movieInfo);
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,20 +79,20 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
 
-                Intent intent = new Intent(getActivity(), DetailActivity.class);
                 MovieInfo movieInfo = null;
                 if (cursor != null) {
                     movieInfo = MovieInfo.getMovieInfo(cursor);
+
+                    ((MovieItemClickCallback)getActivity())
+                            .onItemSelected(movieInfo);
                 }
-                intent.putExtra(Intent.EXTRA_RETURN_RESULT, movieInfo);
-                startActivity(intent);
 
                 mPosition = position;
             }
         });
 
         if (!NetWorkUtils.isNetWorkAvailable(getActivity())) {
-            Snackbar.make(rootView, getString(R.string.network_ont_connected), Snackbar.LENGTH_LONG).show();
+//            Snackbar.make(rootView, getString(R.string.network_ont_connected), Snackbar.LENGTH_LONG).show();
         }
 
         if (null != savedInstanceState &&

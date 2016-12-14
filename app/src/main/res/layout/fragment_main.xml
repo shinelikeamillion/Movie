@@ -1,15 +1,11 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<GridView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/grid_for_movies"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.udacity.movie.fragment.MainFragment">
-
-    <GridView
-        android:id="@+id/grid_for_movies"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:numColumns="2"
-        android:verticalSpacing="@dimen/poster_spacing"
-        android:horizontalSpacing="@dimen/poster_spacing"
-        android:stretchMode="columnWidth"/>
-</FrameLayout>
+    android:horizontalSpacing="@dimen/poster_spacing"
+    android:numColumns="@integer/grid_column"
+    android:stretchMode="columnWidth"
+    android:verticalSpacing="@dimen/poster_spacing"
+    tools:context="com.udacity.movie.fragment.MainFragment"/>

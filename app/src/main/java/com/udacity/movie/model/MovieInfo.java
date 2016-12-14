@@ -38,6 +38,9 @@ import static com.udacity.movie.data.MovieContract.MovieEntry.COL_MOVIE_VOTE_AVE
 
 public class MovieInfo implements Parcelable{
 
+    public static final int FAVORED = 1;
+    public static final int NOT_FAVORED = 0;
+
     private final String BASE_URL = "http://image.tmdb.org/t/p/w185";   // 默认海报前缀
     public String poster_path;                                          // 海报路径
     public String adult;                                                // 是否成人片

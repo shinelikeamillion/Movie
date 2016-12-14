@@ -33,6 +33,9 @@ import com.udacity.movie.utils.Utility;
  */
 public class DetailFragment extends Fragment {
 
+    public static String DETAIL_URI = "URI";
+    public static String DETAIL_FRAGMENT_TAG = "DFT";
+
     MovieInfo mMovieInfo;
 
     private final String TAG = this.getClass().getSimpleName();
@@ -41,7 +44,6 @@ public class DetailFragment extends Fragment {
     private TextView mTvTitle;
     private TextView mTvReleaseDate;
     private TextView mTvPopularity;
-    private TextView mTvVoteCount;
     private TextView mTvOverView;
     private TextView mTvRunTime;
     private TextView mBtnFavored;
@@ -58,7 +60,6 @@ public class DetailFragment extends Fragment {
         mTvTitle = (TextView) rootView.findViewById(R.id.tv_movie_title);
         mTvReleaseDate = (TextView) rootView.findViewById(R.id.tv_movie_release_date);
         mTvPopularity = (TextView) rootView.findViewById(R.id.tv_movie_popularity);
-        mTvVoteCount = (TextView) rootView.findViewById(R.id.tv_movie_vote_count);
         mTvOverView = (TextView) rootView.findViewById(R.id.tv_overview);
         mTvRunTime = (TextView) rootView.findViewById(R.id.tv_runtime);
         mBtnFavored = (TextView) rootView.findViewById(R.id.btn_favorite);
@@ -79,10 +80,10 @@ public class DetailFragment extends Fragment {
                 // TODO: 12/12/16 时间紧张,先存到sharepreference 里面吧
                 if (MyApplication.favoredMovieId.contains(mMovieInfo.id+"")) {
                     MyApplication.favoredMovieId.remove(mMovieInfo.id+"");
-                    mMovieInfo.favored = 0;
+                    mMovieInfo.favored = MovieInfo.NOT_FAVORED;
                 } else {
                     MyApplication.favoredMovieId.add(mMovieInfo.id+"");
-                    mMovieInfo.favored = 1;
+                    mMovieInfo.favored = MovieInfo.FAVORED;
                 }
                 Utility.putFavoredMoviesPreference(getActivity(), MyApplication.favoredMovieId);
                 updateFavoredView();
@@ -92,35 +93,43 @@ public class DetailFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         if (intent.hasExtra(Intent.EXTRA_RETURN_RESULT)) {
             mMovieInfo = intent.getParcelableExtra(Intent.EXTRA_RETURN_RESULT);
-
-            Picasso.with(getActivity()).load(mMovieInfo.poster_path).into(mIvPoster);
-            mTvTitle.setText(mMovieInfo.title);
-            mTvReleaseDate.setText(String.format(getResources().getString(R.string.release_date), mMovieInfo.release_date));
-            mTvPopularity.setText(String.format(getResources().getString(R.string.popularity), mMovieInfo.popularity));
-            mTvVoteCount.setText(String.format(getResources().getString(R.string.vote_count), mMovieInfo.vote_count));
-            mTvOverView.setText(String.format(getResources().getString(R.string.overview), mMovieInfo.overview));
-
-            updateFavoredView();
-
-            String movieId = String.valueOf(mMovieInfo.id);
-            Log.e(TAG, movieId);
-
-            getRuntime(movieId);
-
-            getVideos(movieId+"/videos");
-
-            getReviews(movieId+"/reviews");
+            initData();
+        }
+        Bundle arguments = getArguments();
+        if (null != arguments) {
+            mMovieInfo = arguments.getParcelable(DETAIL_URI);
+            initData();
         }
 
         return rootView;
     }
 
+    private void initData () {
+
+        Picasso.with(getActivity()).load(mMovieInfo.poster_path).into(mIvPoster);
+        mTvTitle.setText(mMovieInfo.title);
+        mTvReleaseDate.setText(String.format(getResources().getString(R.string.release_date), mMovieInfo.release_date));
+        mTvPopularity.setText(String.format(getResources().getString(R.string.popularity), mMovieInfo.popularity));
+        mTvOverView.setText(String.format(getResources().getString(R.string.overview), mMovieInfo.overview));
+
+        updateFavoredView();
+
+        String movieId = String.valueOf(mMovieInfo.id);
+        Log.e(TAG, movieId);
+
+        getRuntime(movieId);
+
+        getVideos(movieId+"/videos");
+
+        getReviews(movieId+"/reviews");
+    }
+
     private void updateFavoredView () {
-        if (mMovieInfo.favored == 1) {
-            mBtnFavored.setText("FAVORED");
+        if (mMovieInfo.favored == MovieInfo.FAVORED) {
+            mBtnFavored.setText(getResources().getString(R.string.favored));
             mBtnFavored.setBackgroundColor(getResources().getColor(R.color.colorAccent));
         } else {
-            mBtnFavored.setText("MARK AS FAVORED");
+            mBtnFavored.setText(getResources().getString(R.string.mark_as_favored));
             mBtnFavored.setBackgroundColor(getResources().getColor(R.color.cardview_dark_background));
         }
     }
