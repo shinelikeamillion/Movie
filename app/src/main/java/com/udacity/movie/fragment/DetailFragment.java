@@ -7,7 +7,6 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -115,7 +114,6 @@ public class DetailFragment extends Fragment {
         updateFavoredView();
 
         String movieId = String.valueOf(mMovieInfo.id);
-        Log.e(TAG, movieId);
 
         getRuntime(movieId);
 

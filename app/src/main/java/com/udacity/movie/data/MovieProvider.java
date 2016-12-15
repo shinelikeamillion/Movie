@@ -81,10 +81,10 @@ public class MovieProvider extends ContentProvider {
                         MovieEntry.TABLE_NAME,
                         projection,
                         sMovieFavoredSelection + getMoviesId(),
-                        selectionArgs,
                         null,
                         null,
-                        sortOrder
+                        null,
+                        null
                 );
                 break;
             }

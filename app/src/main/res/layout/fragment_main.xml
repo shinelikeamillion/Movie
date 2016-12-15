@@ -1,11 +1,27 @@
-<GridView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/grid_for_movies"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:horizontalSpacing="@dimen/poster_spacing"
-    android:numColumns="@integer/grid_column"
-    android:stretchMode="columnWidth"
-    android:verticalSpacing="@dimen/poster_spacing"
-    tools:context="com.udacity.movie.fragment.MainFragment"/>
+    tools:context="com.udacity.movie.fragment.MainFragment">
+
+    <GridView
+        android:id="@+id/grid_for_movies"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:horizontalSpacing="@dimen/poster_spacing"
+        android:numColumns="@integer/grid_column"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="@dimen/poster_spacing"/>
+
+    <TextView
+        android:id="@+id/tv_empty_message"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:textColor="@android:color/darker_gray"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Display1"
+        android:gravity="center"
+        android:visibility="gone"
+        tools:text="empty message"/>
+</FrameLayout>

@@ -19,20 +19,13 @@ public class Utility {
 
     public static String getPreferredSortOrder (Context context) {
         SharedPreferences preferences = getDefaultSharedPreferences(context);
-        return preferences.getString(SORT_ORDER, null);
+        return preferences.getString(SORT_ORDER, MovieEntry.COLUMN_POPUlARITY);
     }
 
     public static void putSortOrderPreference (Context context, String sortOrder) {
         getDefaultSharedPreferences(context)
                 .edit()
                 .putString(SORT_ORDER, sortOrder)
-                .commit();
-    }
-
-    public static void removeSortOrderPreference (Context context) {
-        getDefaultSharedPreferences(context)
-                .edit()
-                .remove(SORT_ORDER)
                 .commit();
     }
 
@@ -51,11 +44,9 @@ public class Utility {
     }
 
     public static String getOrderUrlKey (Context context) {
-        if (null == getPreferredSortOrder(context)) {
-            return null;
-        } else if (getPreferredSortOrder(context).equals(MovieEntry.COLUMN_VOTE_AVERAGE)) {
+        if (getPreferredSortOrder(context).equals(MovieEntry.COLUMN_VOTE_AVERAGE)) {
             return MovieContract.TOP_RATED;
         }
-            return MovieContract.POPULAR;
+        return MovieContract.POPULAR;
     }
 }

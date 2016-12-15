@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.udacity.movie.R;
 import com.udacity.movie.fragment.DetailFragment;
-import com.udacity.movie.fragment.MainFragment;
 import com.udacity.movie.fragment.MainFragment.MovieItemClickCallback;
 import com.udacity.movie.model.MovieInfo;
 import com.udacity.movie.sync.MovieSyncAdapter;
@@ -28,19 +27,12 @@ public class MainActivity extends AppCompatActivity implements MovieItemClickCal
             if (null == savedInstanceState) {
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .add(R.id.movie_detail_container, new DetailFragment(), MOVIE_FRAGMENT_TAG)
+                        .add(R.id.movie_detail_container, new DetailFragment(), DetailFragment.DETAIL_FRAGMENT_TAG)
                         .commit();
             }
         } else {
             mIsBigScreen = false;
             getSupportActionBar().setElevation(0f);
-        }
-
-        if (null == savedInstanceState) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.container, new MainFragment(), MOVIE_FRAGMENT_TAG)
-                    .commit();
         }
 
         MovieSyncAdapter.initializeSyncAdapter(this);

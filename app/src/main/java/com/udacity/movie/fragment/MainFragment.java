@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import com.udacity.movie.MyApplication;
 import com.udacity.movie.R;
@@ -45,6 +46,8 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
 
     private MoviesGridAdapter moviesAdapter;
 
+    private TextView tvEmptyMessage;
+
     public interface MovieItemClickCallback {
         void onItemSelected(MovieInfo movieInfo);
     }
@@ -69,6 +72,7 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
         gridView = (GridView) rootView.findViewById(R.id.grid_for_movies);
+        tvEmptyMessage = (TextView) rootView.findViewById(R.id.tv_empty_message);
 
         moviesAdapter = new MoviesGridAdapter(getActivity(), null, 0);
         gridView.setAdapter(moviesAdapter);
@@ -79,7 +83,7 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
 
-                MovieInfo movieInfo = null;
+                MovieInfo movieInfo;
                 if (cursor != null) {
                     movieInfo = MovieInfo.getMovieInfo(cursor);
 
@@ -91,16 +95,17 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
             }
         });
 
-        if (!NetWorkUtils.isNetWorkAvailable(getActivity())) {
-//            Snackbar.make(rootView, getString(R.string.network_ont_connected), Snackbar.LENGTH_LONG).show();
-        }
-
         if (null != savedInstanceState &&
                 savedInstanceState.containsKey(SELECTED_KEY)) {
             mPosition = savedInstanceState.getInt(SELECTED_KEY);
         }
 
         return rootView;
+    }
+
+    private void setEmptyMessage (String message) {
+        tvEmptyMessage.setVisibility(View.VISIBLE);
+        tvEmptyMessage.setText(message);
     }
 
     @Override
@@ -139,7 +144,6 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
                 break;
             case R.id.action_favored:
                 MyApplication.uri = MovieEntry.buildMovieFavored();
-                Utility.removeSortOrderPreference(getActivity());
                 getLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
                 break;
 
@@ -160,19 +164,30 @@ public class MainFragment extends Fragment implements LoaderCallbacks<Cursor>{
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String sortOrder = Utility.getPreferredSortOrder(getActivity());
         String orderKey = Utility.getOrderUrlKey(getActivity());
-        String[] selection = null != orderKey ? new String[] {orderKey} : null;
+        String[] selection = new String[] {orderKey};
         return new CursorLoader(
                 getActivity(),
                 MyApplication.uri,
                 null,
                 null,
                 selection,
-                null != sortOrder? sortOrder + " DESC" : null
+                sortOrder + " DESC"
         );
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        if (!NetWorkUtils.isNetWorkAvailable(getActivity()) && data.getCount() == 0) {
+            setEmptyMessage(getString(R.string.no_internet_connection));
+            return;
+        } else if (MyApplication.uri.equals(MovieEntry.buildMovieFavored()) && data.getCount() == 0) {
+            setEmptyMessage(getString(R.string.no_favored_movies));
+            return;
+        } else {
+            tvEmptyMessage.setVisibility(View.GONE);
+        }
+
         moviesAdapter.swapCursor(data);
         if (mPosition != GridView.INVALID_POSITION) {
             gridView.smoothScrollToPosition(mPosition);
