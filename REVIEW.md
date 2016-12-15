@@ -52,7 +52,18 @@
 13. using an implicit intent(隐式意图) to startActivity, it is good practice to do so.
 learn more about it [here](https://developer.android.com/guide/components/intents-filters.html#ExampleSend), [here](https://developer.android.com/training/basics/intents/sending.html#Verify) [and here](https://www.youtube.com/watch?v=HGElAW224dE)
 
+### review - 16/12/2016
+1. An emptyView is needed. 
+2. Test more before submit
+
 TODO:
 >
-缓存图片到本地
-动态计算图片的宽高
+1. 缓存图片到本地
+2. 动态计算图片的宽高
+3. redesign the ui ( no connection and no data)
+
+> Options:
+1. more material design when i have more free time
+2. let users can share
+3. keep database fresh
+4. international and accessible
